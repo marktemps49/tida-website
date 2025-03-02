@@ -18,12 +18,40 @@ body {
     justify-content: center;
     color: white;
     text-align: center;
+    position: relative;
+}
+
+.hero .header-logo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.hero .header-logo img {
+    height: 60px;
+    width: auto;
 }
 
 .hero .overlay {
-    background: rgba(0, 0, 0, 0.5);
     padding: 20px;
     border-radius: 8px;
+}
+
+.hero .overlay.no-bg {
+    background: none;
+}
+
+.btc-ticker {
+    margin-top: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffcc00;
+}
+
+.highlight-text {
+    color: #fb607f;
+    font-weight: bold;
+    font-size: 1.1rem;
 }
 
 .section {
