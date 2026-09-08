@@ -3,48 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIDA - Property Investments</title>
+    <title>TIDA Credit Checker</title>
     <link rel="stylesheet" href="styles.css">
-    <script>
-        async function fetchBitcoinPrice() {
-            try {
-                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=gbp');
-                const data = await response.json();
-                const price = data.bitcoin.gbp;
-                document.getElementById('btc-price').innerText = `₿ Bitcoin Price: £${price}`;
-            } catch (error) {
-                document.getElementById('btc-price').innerText = '₿ Bitcoin Price: Unable to fetch';
-            }
-        }
-        window.onload = fetchBitcoinPrice;
-    </script>
 </head>
 <body>
 
-<header class="hero">
+<header class="app-header">
     <div class="header-logo">
         <img src="images/tida-logo.png" alt="TIDA Logo">
     </div>
-    <div class="overlay no-bg">
-        <h1>Traditional Investments<br>Digital Assets</h1>
-        <p class="highlight-text">Wealth creation for high net worth investors</p>
-        <div id="btc-price" class="btc-ticker">₿ Bitcoin Price: Loading...</div>
+    <div class="header-title">
+        <h1>TIDA Credit Checker</h1>
+        <p class="subtitle">Enter a deal's details to generate an indicative credit score out of 100.</p>
     </div>
 </header>
 
-<section class="section">
-    <h2>About Us</h2>
-    <p>We connect property investors with high-quality real estate projects, ensuring transparency, trust, and performance at every step.</p>
-</section>
+<nav class="tabs">
+    <button id="tab-new" class="tab active">New Deal</button>
+    <button id="tab-saved" class="tab">Saved Deals</button>
+</nav>
 
-<section class="section">
-    <h2>Our Services</h2>
-    <p>Eco-housing investments, property loans, and innovative property-backed cryptocurrency products.</p>
-</section>
+<main class="container">
+
+    <section id="panel-new" class="panel">
+        <div class="deal-meta">
+            <div class="field">
+                <label for="deal-name">Deal Name / Reference</label>
+                <input type="text" id="deal-name" placeholder="e.g. Chiswick Office Refurb">
+            </div>
+            <div class="field">
+                <label for="deal-type">Loan Type</label>
+                <select id="deal-type">
+                    <option value="Development">Development</option>
+                    <option value="Planning">Planning</option>
+                    <option value="Transition">Transition</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="fields-container"></div>
+
+        <div class="actions">
+            <button id="calc-btn" class="btn btn-primary">Calculate Credit Score</button>
+            <button id="reset-btn" class="btn btn-secondary">Reset</button>
+        </div>
+
+        <div id="result-card" class="result-card" hidden>
+            <div id="incomplete-warning" class="incomplete-warning" hidden>
+                Incomplete assessment — not all applicable fields have been answered. The score below reflects only the fields entered so far and may change as more are completed.
+            </div>
+            <div class="result-top">
+                <div class="score-circle">
+                    <span id="score-number">0</span>
+                    <span class="score-out-of">/100</span>
+                </div>
+                <div class="result-summary">
+                    <div id="score-band" class="score-band">—</div>
+                    <div class="score-progress-track">
+                        <div id="score-progress" class="score-progress-bar"></div>
+                    </div>
+                    <div id="score-completeness" class="score-completeness"></div>
+                </div>
+            </div>
+
+            <h3>Category Breakdown</h3>
+            <div id="category-breakdown" class="category-breakdown"></div>
+
+            <button id="save-deal-btn" class="btn btn-primary">Save Deal</button>
+        </div>
+    </section>
+
+    <section id="panel-saved" class="panel" hidden>
+        <h2>Saved Deals</h2>
+        <p id="saved-empty" class="empty-state">No deals saved yet. Score a deal and click "Save Deal" to keep it here.</p>
+        <div id="saved-deals-list" class="saved-deals-list"></div>
+    </section>
+
+</main>
 
 <footer class="footer">
-    <p>© 2025 TIDA - All rights reserved.</p>
+    <p>&copy; 2026 TIDA — Internal credit scoring tool. Indicative scoring only, not a substitute for Credit Committee review.</p>
 </footer>
 
+<script src="js/credit-model.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
