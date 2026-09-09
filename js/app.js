@@ -219,10 +219,12 @@ function renderSavedDeals() {
       `;
     } else {
       const band = riskBand(deal.score);
+      const sourceTag = deal.source === 'upload' ? ' · AI-extracted' : '';
+      const unresolvedTag = deal.unresolved && deal.unresolved.length ? ` · ${deal.unresolved.length} unresolved` : '';
       row.innerHTML = `
         <div class="saved-deal-main">
           <div class="saved-deal-name">${escapeHtml(deal.name)}</div>
-          <div class="saved-deal-meta">${deal.dealType} · ${new Date(deal.savedAt).toLocaleDateString()} · ${deal.answered}/${deal.totalFields} fields</div>
+          <div class="saved-deal-meta">${deal.dealType} · ${new Date(deal.savedAt).toLocaleDateString()} · ${deal.answered}/${deal.totalFields} fields${sourceTag}${unresolvedTag}</div>
         </div>
         <div class="saved-deal-score ${band.className}">${deal.score}</div>
         <button class="btn-link btn-load" data-id="${deal.id}">Load</button>
@@ -249,6 +251,7 @@ function renderSavedDeals() {
       els.dealName.value = deal.name;
       els.dealType.value = deal.dealType;
       switchTab('new');
+      document.querySelector('.manual-entry').open = true;
       renderFields();
       renderResult();
     });

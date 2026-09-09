@@ -255,6 +255,26 @@ body {
     color: var(--high-risk);
 }
 
+.upload-status {
+    font-size: 0.85rem;
+    background: #eef6ff;
+    color: #1a5b9e;
+    border: 1px solid #cfe4fa;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+}
+
+.upload-status[hidden] {
+    display: none;
+}
+
+.upload-status-error {
+    background: #fdeceb;
+    color: #a3261f;
+    border-color: #f6c7c3;
+}
+
 .upload-disclaimer {
     font-size: 0.78rem;
     color: var(--ink-soft);

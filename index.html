@@ -60,7 +60,9 @@
                 <button id="submit-deal-btn" class="btn btn-primary" disabled>Submit for Scoring</button>
             </div>
 
-            <p class="upload-disclaimer">Files stay in your browser for this session. Automated document extraction isn't connected yet — submitting records the deal as <strong>pending extraction</strong> until TIDA's methodology agent is wired in.</p>
+            <p id="upload-status" class="upload-status" hidden></p>
+
+            <p class="upload-disclaimer">Files stay in your browser except when submitted for scoring, when they're sent to the methodology agent for this request only. If the scoring server can't be reached, the deal is saved as <strong>pending extraction</strong> instead.</p>
         </div>
 
         <details class="manual-entry">
