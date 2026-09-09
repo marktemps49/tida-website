@@ -89,7 +89,7 @@ body {
 /* Fields */
 .deal-meta {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 16px;
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -102,6 +102,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 0;
 }
 
 .field label {
@@ -112,6 +113,8 @@ body {
 
 .field input,
 .field select {
+    width: 100%;
+    max-width: 100%;
     padding: 8px 10px;
     border: 1px solid var(--border);
     border-radius: 6px;
@@ -546,4 +549,118 @@ body {
     background-color: #222;
     color: #ccc;
     font-size: 0.8rem;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+    .app-header {
+        padding: 16px;
+        gap: 14px;
+    }
+
+    .app-header .header-logo img {
+        height: 38px;
+    }
+
+    .app-header h1 {
+        font-size: 1.15rem;
+    }
+
+    .app-header .subtitle {
+        font-size: 0.82rem;
+    }
+
+    .tabs {
+        padding: 0 12px;
+        overflow-x: auto;
+    }
+
+    .tab {
+        padding: 12px 14px;
+        font-size: 0.88rem;
+        white-space: nowrap;
+    }
+
+    .container {
+        padding: 16px 12px;
+    }
+
+    .deal-meta {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 14px;
+        gap: 14px;
+    }
+
+    .upload-card,
+    .manual-entry,
+    .category-section {
+        padding: 14px;
+    }
+
+    .category-section summary {
+        padding: 10px 0;
+    }
+
+    .dropzone {
+        padding: 24px 14px;
+    }
+
+    .fields-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+        padding-top: 12px;
+    }
+
+    .actions {
+        flex-direction: column;
+        margin: 16px 0;
+    }
+
+    .actions .btn {
+        width: 100%;
+    }
+
+    .result-card {
+        padding: 16px;
+    }
+
+    .result-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .score-circle {
+        width: 88px;
+        height: 88px;
+        align-self: center;
+    }
+
+    #score-number {
+        font-size: 1.9rem;
+    }
+
+    .file-row {
+        flex-wrap: wrap;
+    }
+
+    .file-row-name {
+        flex-basis: 100%;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .saved-deal-row {
+        flex-wrap: wrap;
+        gap: 10px 16px;
+    }
+
+    .saved-deal-main {
+        flex-basis: 100%;
+    }
+
+    .saved-deal-score,
+    .saved-deal-status {
+        text-align: left;
+    }
 }
