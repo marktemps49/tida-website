@@ -53,11 +53,47 @@ here downgrades it for you automatically.
 ## Deploying
 
 This is a plain Express app with no framework lock-in — deploy it wherever
-you run Node processes (Render, Fly.io, Railway, a VM, a container, etc.),
-or adapt `server.js`'s route handler into a serverless function (Vercel/
-Netlify/Cloudflare) if that's your hosting. Whatever you choose:
+you run Node processes. Recommended: **Render** (simplest, free tier
+available) or **Railway** (similar tradeoffs). Both spin down an idle free
+instance, giving a ~30-60s cold start on the first request after a quiet
+period; upgrade to a paid tier to keep it warm once that matters.
 
-- Set `ANTHROPIC_API_KEY` as a server-side secret — never ship it to the browser.
-- Set `CORS_ORIGIN` to the site's real origin once it's not `*` for local dev.
-- Point the frontend at the deployed URL — see `SCORING_API_URL` in
-  `../js/upload.js`.
+A serverless platform (Vercel/Netlify/Cloudflare Functions) is a worse fit
+for this specific workload — deal extraction can take 30-90+ seconds and
+uploads can run tens of MB, both of which fight the free-tier timeout and
+body-size limits on those platforms. Stick to a long-running server unless
+you're prepared to configure around that.
+
+### Render
+
+There's a best-effort `render.yaml` Blueprint at the repo root — try
+**New > Blueprint**, point it at this repo, and see if it picks it up. If
+it doesn't parse cleanly (unverified against Render's current schema),
+fall back to the manual path, which doesn't depend on the YAML being
+right:
+
+1. **New > Web Service**, connect this GitHub repo.
+2. **Root Directory**: `server`
+3. **Build Command**: `npm install`
+4. **Start Command**: `npm start`
+5. **Environment** tab → add `ANTHROPIC_API_KEY` (your key, marked secret)
+   and optionally `ANTHROPIC_MODEL` / `CORS_ORIGIN`. Leave `PORT` alone —
+   Render sets it automatically and `server.js` already reads it.
+6. Deploy, then confirm with `curl https://<your-service>.onrender.com/api/health`.
+
+### Railway
+
+1. **New Project > Deploy from GitHub repo**, pick this repo.
+2. In the service's **Settings**, set **Root Directory** to `server`.
+3. Railway auto-detects `npm install` / `npm start` from `package.json` —
+   confirm those are the build/start commands.
+4. **Variables** tab → add `ANTHROPIC_API_KEY` (and optionally
+   `ANTHROPIC_MODEL` / `CORS_ORIGIN`). Railway sets `PORT` automatically too.
+5. Deploy, then confirm with `curl https://<your-service>.up.railway.app/api/health`.
+
+### After either one
+
+- Set `CORS_ORIGIN` to the frontend's real origin once it's live somewhere
+  other than `localhost` — don't leave it at `*` in production.
+- Update `SCORING_API_URL` in `../js/upload.js` to the deployed URL (it
+  currently points at `http://localhost:8787` for local dev).

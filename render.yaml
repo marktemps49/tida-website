@@ -1,0 +1,24 @@
+# Render Blueprint for the TIDA methodology server.
+#
+# NOTE: this file is best-effort — I couldn't verify it against Render's
+# current docs (this session's network policy blocks render.com), so if
+# "New Blueprint Instance" fails to parse it, just use the manual dashboard
+# steps in server/README.md instead (New Web Service, root dir `server`,
+# build `npm install`, start `npm start`) — that path doesn't depend on
+# this file being exactly right.
+services:
+  - type: web
+    name: tida-methodology-server
+    env: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: claude-opus-5
+      - key: CORS_ORIGIN
+        sync: false
