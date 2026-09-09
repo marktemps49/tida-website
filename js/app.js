@@ -204,18 +204,31 @@ function renderSavedDeals() {
   els.savedEmpty.hidden = deals.length > 0;
 
   deals.forEach((deal) => {
-    const band = riskBand(deal.score);
     const row = document.createElement('div');
     row.className = 'saved-deal-row';
-    row.innerHTML = `
-      <div class="saved-deal-main">
-        <div class="saved-deal-name">${escapeHtml(deal.name)}</div>
-        <div class="saved-deal-meta">${deal.dealType} · ${new Date(deal.savedAt).toLocaleDateString()} · ${deal.answered}/${deal.totalFields} fields</div>
-      </div>
-      <div class="saved-deal-score ${band.className}">${deal.score}</div>
-      <button class="btn-link btn-load" data-id="${deal.id}">Load</button>
-      <button class="btn-link btn-delete" data-id="${deal.id}">Delete</button>
-    `;
+
+    if (deal.status === 'pending') {
+      const fileSummary = deal.files.length === 1 ? deal.files[0].name : `${deal.files.length} files`;
+      row.innerHTML = `
+        <div class="saved-deal-main">
+          <div class="saved-deal-name">${escapeHtml(deal.name)}</div>
+          <div class="saved-deal-meta">${deal.dealType} · ${new Date(deal.savedAt).toLocaleDateString()} · ${escapeHtml(fileSummary)}</div>
+        </div>
+        <div class="saved-deal-status">Pending Extraction</div>
+        <button class="btn-link btn-delete" data-id="${deal.id}">Delete</button>
+      `;
+    } else {
+      const band = riskBand(deal.score);
+      row.innerHTML = `
+        <div class="saved-deal-main">
+          <div class="saved-deal-name">${escapeHtml(deal.name)}</div>
+          <div class="saved-deal-meta">${deal.dealType} · ${new Date(deal.savedAt).toLocaleDateString()} · ${deal.answered}/${deal.totalFields} fields</div>
+        </div>
+        <div class="saved-deal-score ${band.className}">${deal.score}</div>
+        <button class="btn-link btn-load" data-id="${deal.id}">Load</button>
+        <button class="btn-link btn-delete" data-id="${deal.id}">Delete</button>
+      `;
+    }
     els.savedDealsList.appendChild(row);
   });
 
