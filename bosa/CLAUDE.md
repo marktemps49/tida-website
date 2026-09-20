@@ -44,6 +44,14 @@ specific Gmail inbox (access to be provided later by the user).
 - Error handling / retry behavior if a scrape or login fails.
 - How multiple deals in flight at once should be handled (concurrency, dedup).
 
+## Stack & layout
+
+Bosa is a Node.js project living entirely under `bosa/` in the
+`tida-website` repo (not a separate repo). Stack: Playwright for
+site login/scraping, `googleapis` for Gmail. See `bosa/README.md` for
+setup and the file layout — every module is currently a stub with a
+`TODO`/thrown error marking what depends on an open item below.
+
 ## Working conventions
 
 - Keep this file up to date as decisions are made on the open items above —
