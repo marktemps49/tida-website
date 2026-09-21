@@ -49,16 +49,34 @@ specific Gmail inbox (access to be provided later by the user).
   `https://www.capitalrise.com/property-investment/<Deal-Name-Slug>`
   (surrounded by click-tracking redirect links — `extractDealUrl()`
   regex-matches the direct `capitalrise.com` one).
-- **Fields available in the email's "INVESTMENT HIGHLIGHTS" table** (and
-  presumably also on the deal page itself): Forecast Net Return, Estimated
-  Term, Anticipated LTV at Exit, IFISA Eligible, Legal Charge, Loan Type.
-  No loan amount is in the email — TBD whether it's on the full deal page.
-- **⚠️ Unverified**: this sandbox's network egress is blocked to
-  `capitalrise.com` (org policy), so the login form selectors and
-  highlight-table scraping in `capitalrise.js` were written from the
-  email's content and typical site patterns, but never run against the
-  real pages. Whoever runs Bosa somewhere with real internet access needs
-  to verify/fix the selectors in `login()` and `readLabelledValue()`.
+- **Real deal page content**: the user pasted the full Bourne End deal page
+  text directly (this sandbox can't fetch it itself) — saved verbatim at
+  `src/scraper/sites/__fixtures__/capitalrise-bourne-end.txt` for offline
+  development/testing. The page's actual "Investment Highlights" table
+  labels differ from the email's summary table — use these, not the
+  email's wording, as the source of truth:
+  - `Net forecast annual return` (email said "Forecast Net Return")
+  - `Total loan amount` — e.g. "£13.6 million" (**not in the email at all**)
+  - `Total CapitalRise investor raise` — e.g. "£3.1 million" (not in email)
+  - `Estimated term`
+  - `Anticipated LTV at exit`
+  - `ISA` → "Eligible" (email said "IFISA Eligible")
+  - `Product` — e.g. "Debt - Deep Discounted Bonds" (not in email)
+  - `Security` — longer free text, not a single value
+  Plus a full "Investment Summary" prose section (PLAN, TERM, LOCATION,
+  PROPERTY, THE BORROWER, THE SECURITY, SECURITY TRUSTEE, VALUATION, LOAN
+  TO VALUE, EXIT PLAN), a Financials section (funding structure at entry
+  vs. exit), and a Risks table. Full detail in the fixture file.
+  **The user is providing the target extraction format separately —
+  `capitalrise.js`'s `HIGHLIGHT_LABELS`/`extractDealFields` have not been
+  rewritten to match the real page yet; that's the next step once the
+  format arrives.**
+- **⚠️ Still unverified against the live site**: this sandbox's network
+  egress is blocked to `capitalrise.com` (org policy), so even once
+  `capitalrise.js` is rewritten to extract the fields above, the actual
+  DOM selectors (`login()`, `readLabelledValue()`) are unverified — no
+  browser has ever loaded the real page. Whoever runs Bosa somewhere with
+  real internet access needs to confirm/fix them.
 - Useful debug tool: `node scripts/gmail-search.js "<gmail query>"` — reads
   the watched inbox directly (already-working Gmail API) and prints
   sender/subject/body/links for any message. Used to work out the above

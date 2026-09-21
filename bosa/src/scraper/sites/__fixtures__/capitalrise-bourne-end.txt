@@ -1,0 +1,86 @@
+Source: https://www.capitalrise.com/property-investment/Bourne-End-Buckinghamshire-Bridge-Loan
+Saved: 2026-09-21 (pasted by user — this sandbox has no network access to capitalrise.com)
+Purpose: real deal-page content for building/testing the CapitalRise extraction
+logic offline. See bosa/CLAUDE.md "Sources > CapitalRise".
+
+Investment Summary
+PLAN – CapitalRise is providing a bridge loan to the Borrower to refinance the existing debt secured on a development of six houses in Bourne End, Buckinghamshire (the Properties) and provide a sales bridge period. CapitalRise investors will fund the loan alongside an institutional funding partner. Investors will be repaid after the institutional funding partner and will receive a higher rate of return to reflect the increased risk. N.B. There are no phases or tiers to this deal, and this represents the sole opportunity for CapitalRise investors to invest in this deal.
+TERM – The estimated term for this investment is 12-18 months. If the loan is not repaid by the end of the estimated term, returns will accrue on investments for a further 6 months from the end of the estimated term up until the hard stop date (August 2028).
+LOCATION – The Properties are in Bourne End, Buckinghamshire, a county which forms part of the London Commuter belt.  The Properties are between the M40 to the north and the M4 to the south with good accessibility to both. Bourne End has a direct rail link to London and is approximately five miles south-east of High Wycombe and three miles east of Marlow, which provides the main retail and leisure facilities.
+PROPERTY - The Properties are six substantial detached houses, which have already been constructed. Each house is individually designed with at least five bedrooms, with one house having a triple garage. Each house has been built to a high specification and finish. Internally, the Properties have wood effect luxury vinyl tiles throughout the ground floor parts and carpet to the stairs and bedrooms and fully-tiled bathrooms and WCs. The Properties are listed with Savills and Bovingdons, which are both established and experienced agents in this area. You can see the link to the Savills sales brochure here
+THE BORROWER – The ultimate beneficiary owner (UBO) of the borrowing entity is an experienced property professional who has over a decade of experience delivering high specification residential developments across London and the Home Counties
+THE SECURITY – The security package for the loan to the Borrower is shared with the institutional funding partner and includes Shared First Legal Charge over the Properties. CapitalRise investors are subordinated to the institutional funding partner and will be repaid after the institutional funding partner. Therefore, this investment has a risk profile more like a mezzanine loan than a senior loan and CapitalRise investors will receive a higher rate of return than the institutional funding partner to reflect the increased risk.
+SECURITY TRUSTEE - CapitalRise is the security trustee for both CapitalRise investors and the institutional funding partner. CapitalRise will always act in the best interests of both CapitalRise investors and the institutional funding partner and will always seek to recover both invested capital and accrued interest in full. If the Borrower were unable to repay the loan, CapitalRise could force the sale of the Property and would always seek to recover all invested capital and accrued returns on behalf of all investors. In this situation, CapitalRise investors will be paid after the institutional funding partner but before the Borrower.
+VALUATION - Bruton Knowles have provided an independent Red Book market valuation (July 2026). It provides a current market value (CMV) of the Properties of £20.0m (32,904 sq.ft). CapitalRise investors' gross breakeven is £456 psf
+LOAN TO VALUE – The day one loan to value (LTV) on this investment is 68% based on the CMV of £20.0m. The exit LTV for CapitalRise investors is anticipated to be 75% based on the CMV of £20.0m.
+EXIT PLAN – The Borrower plans to exit the loan through the sale of the Properties, which will allow them to pay back the CapitalRise debt. If a sale is not completed within the term, the Borrower may seek to refinance the CapitalRise debt. It should be noted that as the Properties are being sold as independent units it is likely that there will be partial redemptions on this opportunity.
+
+Investment Highlights
+Net forecast annual return	10.20% p.a. paid at the end of the term
+Total loan amount	£13.6 million
+Total CapitalRise investor raise	£3.1 million
+Estimated term	12-18 months (August 2027 - February 2028)
+Anticipated LTV at exit	75%
+ISA	Eligible
+Product	Debt - Deep Discounted Bonds
+Security	The Security package below is shared between the institutional funding partner and CapitalRise investors. CapitalRise investors will be repaid after the institutional funding partner.
+Shared First Legal Charge over the Property
+Charge over the shares of the Borrower.
+Debenture over the Borrower.
+Personal Guarantee from the UBO, limited to 25% of the Gross Loan.
+None of the capital you invest will be paid to third parties in connection with the issue of the investments. CapitalRise's fees will be paid by the Borrower.
+This financial promotion was signed off on 29/07/2026.
+
+Date of funding
+Investments will be processed on or around 18th August 2026. Funds then will be processed at least every two business days.
+
+Returns Calculator
+Return - Forecast return of 10.20% p.a. paid at the end of the term. Returns calculated here are up to the earlier of the estimated date range.
+Investment amount £1,000
+Total Return £107
+
+Financials
+FUNDING STRUCTURE - AT ENTRY (AUGUST 2026)
+Borrower Equity £20m 100%
+CapitalRise Investors £13.6m 68%
+Institutional Funding Partner £10.5m 53%
+When investing, you are providing a loan to a borrower. In return, you are issued bonds by a dedicated subsidiary property company (CR BOURNE END SS LIMITED). The company is the beneficiary of a Shared First Legal Charge over the Property.
+
+FUNDING STRUCTURE - AT EXIT (AUGUST 2027)
+Borrower Equity £20m 100%
+CapitalRise Investors £15m 75%
+Institutional Funding Partner £11.4m 57%
+In the event of a forced sale, CapitalRise investors will be repaid after the Institutional Funding Partner. If a sale is achieved the value would need to be less than 75% of the current market value (CMV) before CapitalRise investors' invested capital and accrued return are at risk.
+
+Investment Structure
+A subsidiary company of CapitalRise, CR BOURNE END SS LIMITED has been incorporated to issue bonds to investors. Corporate information on CR BOURNE END SS LIMITED can be found at Companies House here.
+CR BOURNE END SS LIMITED has already sourced some finance from pre-funding investors in order to facilitate the property transaction. We, CapitalRise Finance Limited, are one of the pre-funders and the other pre-funders may be associated with us. The CapitalRise investors' funds will be used to refinance the pre-funders.
+As this phase has been pre-funded, settlement of investments is not conditional on reaching a minimal threshold of funding.
+Your investment is ring-fenced from other CapitalRise investments because CR BOURNE END SS LIMITED will not carry on any other commercial activity. The directors of this company will (through CapitalRise) administer and enforce the terms of the bonds issued by CR BOURNE END SS LIMITED.
+The investment is structured as deep-discounted bonds. Deep-discounted bonds (also known as a zero coupon bond where no interest is paid or discount bond) are bonds bought at a price lower than its face value, with the face value repaid at the time of maturity.
+Investors in all phases are ranked pari passu (equal). This means holders of earlier issued bonds will be repaid at the same time as holders of bonds issued during later phases.
+CR BOURNE END SS LIMITED is the beneficiary of a Shared First Legal Charge. In any forced sale of the Property, investors will recover their capital and accrued return before the Borrower, but after the institutional funding partner. Due to the higher risk, investors will benefit from a higher rate of return than the institutional funding partner.
+If the bonds are repaid before the hard stop date then CR BOURNE END SS LIMITED is not required to withhold UK income tax on this investment and so returns will be paid gross.
+Should the bonds be repaid after the hard stop date (August 2028) late payment interest will accrue at the rate of 12.20% p.a. For bonds not purchased using the CapitalRise IFISA which have accrued interest after the hard stop date, CapitalRise is required by HMRC to withhold the basic rate of tax (20%) on interest payments and pay this directly to HMRC.
+
+Risks
+Capital and Income Risk – Your capital is at risk and the income is not guaranteed.
+Compensation Scheme – The Financial Services Compensation Scheme does not cover poor investment performance.
+Subordination Risk – Investors will be repaid after the institutional funding partner.
+Market Risk – If the market for residential property in the local area deteriorates, it may not be possible to sell the Properties at the price currently projected and/or there could be a delay in the sales.
+Investment Liquidity Risk – You need to be prepared to hold this investment for the full term.
+Recovery Risk – If CapitalRise has to enforce its security package the enforcement of security may not be sufficient to cover the return of all capital and interest.
+Sales Rate Risk – Sales may be slower than forecast and/or the properties may sell for less.
+Refinance Risk – The Borrower may refinance their debt at the end of the term. They may not be able to do so.
+
+Deal Room
+Risks and due diligence
+Before any investment is offered to investors it must pass our due diligence and credit approval process.
+The CapitalRise rating is designed to help investors to compare CapitalRise investments. The higher along the risk scale a project is the more risky it is and therefore the higher return you should expect.
+Note: This risk rating is provided by CapitalRise and is not independently verified.
+The valuation for this property contains sensitive information. We are therefore only able to provide this upon request.
+
+Borrower: A Borrower who has completed more than 5 projects.
+Property & Business Plan: A sales bridge loan.
+Capital Structure: Subordinated senior debt (ranking behind a funding partner) with an exit LTV of 75%
+Security: Shared security package where CapitalRise Investors are subordinated to the Institutional Funding Partner and will be repaid second.
