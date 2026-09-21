@@ -59,7 +59,8 @@ export async function scrapeDeal(dealEmail) {
   try {
     const page = await browser.newPage();
     await login(page, email, password);
-    await page.goto(dealUrl, { waitUntil: "networkidle" });
+    await page.goto(dealUrl, { waitUntil: "domcontentloaded" });
+    await waitForContentReady(page);
 
     const pageTitle = await readPageTitle(page);
     const bodyText = await page.innerText("body");
@@ -99,7 +100,14 @@ export function extractDealUrl(htmlOrText) {
 }
 
 async function login(page, email, password) {
-  await page.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" });
+  // "networkidle" (waiting for a quiet period in network activity) is
+  // unreliable on real sites — a live run timed out here entirely, likely
+  // because something on the page (chat widget, analytics, polling) never
+  // goes fully quiet. "domcontentloaded" is faster and more reliable; the
+  // subsequent page.fill()/page.click() calls already auto-wait for their
+  // own target elements to be actionable, so nothing here depends on the
+  // network having gone idle.
+  await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
   // The login page also has a (hidden) registration form sharing generic
   // input types/names — a real run found page.fill() silently picking the
   // invisible "RegisterForm[password]" field and timing out. `:visible` is
@@ -109,7 +117,35 @@ async function login(page, email, password) {
   await page.fill('input[type="email"]:visible, input[name="email"]:visible', email);
   await page.fill('input[type="password"]:visible, input[name="password"]:visible', password);
   await page.click('button[type="submit"]:visible');
-  await page.waitForLoadState("networkidle");
+  // Wait for navigation away from /login as the sign of a successful
+  // submit, rather than networkidle. If the site instead does an in-place
+  // AJAX login without a URL change, this times out harmlessly and the
+  // caller proceeds — worth revisiting if login turns out not to have
+  // actually succeeded.
+  await page.waitForURL((url) => !url.pathname.includes("/login"), { timeout: 15000 }).catch(() => {
+    console.warn("login: URL didn't change away from /login within 15s — login may not have completed");
+  });
+}
+
+/**
+ * Waits for a sign that the deal page's dynamic content (the highlights
+ * table) has actually rendered, rather than trusting domcontentloaded/
+ * networkidle timing. Falls back to proceeding anyway (with a warning) if
+ * the expected text never shows up, so a wrong guess here doesn't hard-fail
+ * the whole scrape — it'll just be visible in the extracted fields being
+ * empty, same as before, but with a clearer cause in the logs.
+ */
+async function waitForContentReady(page) {
+  await page
+    .getByText("Investment Highlights", { exact: false })
+    .first()
+    .waitFor({ timeout: 15000 })
+    .catch(() => {
+      console.warn(
+        'waitForContentReady: "Investment Highlights" never appeared within 15s — ' +
+          "proceeding anyway, but scraped fields are likely to be empty/wrong"
+      );
+    });
 }
 
 async function readPageTitle(page) {
