@@ -6,10 +6,16 @@ name: Bosa daily deal scrape
 # "Check it's actually 5pm UK time" step below skips whichever one doesn't
 # currently correspond to 17:00 Europe/London, so only one actually runs
 # each day regardless of the time of year.
+#
+# PAUSED (per user request, 2026-09-21): the `schedule` triggers below are
+# commented out, so this only runs when manually triggered
+# (workflow_dispatch — the "Run workflow" button, or an API/MCP trigger).
+# Un-comment the two `cron:` lines under `schedule:` to resume the daily
+# automatic run.
 on:
-  schedule:
-    - cron: "0 16 * * *"
-    - cron: "0 17 * * *"
+  # schedule:
+  #   - cron: "0 16 * * *"
+  #   - cron: "0 17 * * *"
   workflow_dispatch:
     inputs:
       max_deals:

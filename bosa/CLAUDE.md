@@ -25,6 +25,13 @@ in a real (if network-blocked) run against the actual inbox, which found
 14 past "NEW INVESTMENT OPPORTUNITY" emails from CapitalRise, none
 previously labeled.
 
+**⏸️ Paused (2026-09-21, user request)**: the schedule is currently
+commented out in `.github/workflows/bosa-daily.yml` — Bosa only runs when
+manually triggered, while CapitalRise (and future sources) are still being
+verified. The user will say when to turn the daily automatic run back on;
+at that point, un-comment the two `cron:` lines under `schedule:` in that
+file (see the comment there for why there are two).
+
 ## Pipeline steps
 
 1. **Watch** the designated Gmail inbox for incoming deal emails.

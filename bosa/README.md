@@ -84,8 +84,14 @@ nothing is skipped just for being old), and exits.
 5pm UK time (handling the BST/GMT switch automatically — see the comment
 in that file) and pulls all secrets from the repo's GitHub Actions
 secrets, not `.env` (which stays local-only, used for `npm start` when
-testing by hand). It can also be triggered manually from the Actions tab
-("Run workflow") for testing.
+testing by hand).
+
+**⏸️ Currently paused**: the daily schedule is commented out in
+`bosa-daily.yml` at the user's request, while CapitalRise (and future
+sources) are still being verified. It only runs when manually triggered
+(Actions tab → "Run workflow", or via the API/MCP) until the user says to
+turn the automatic daily run back on — just un-comment the two `cron:`
+lines under `schedule:` in that file.
 
 ## Layout
 
