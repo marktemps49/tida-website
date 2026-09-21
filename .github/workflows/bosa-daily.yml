@@ -10,7 +10,12 @@ on:
   schedule:
     - cron: "0 16 * * *"
     - cron: "0 17 * * *"
-  workflow_dispatch: {} # allows manually triggering a run for testing
+  workflow_dispatch:
+    inputs:
+      max_deals:
+        description: "Cap on deals processed this run (leave empty for no limit)"
+        required: false
+        type: string
 
 jobs:
   run-bosa:
@@ -57,3 +62,4 @@ jobs:
           GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
           SOURCE_CAPITALRISE_EMAIL: ${{ secrets.SOURCE_CAPITALRISE_EMAIL }}
           SOURCE_CAPITALRISE_PASSWORD: ${{ secrets.SOURCE_CAPITALRISE_PASSWORD }}
+          BOSA_MAX_DEALS: ${{ inputs.max_deals }}
