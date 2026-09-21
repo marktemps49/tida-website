@@ -20,7 +20,10 @@ import fs from "node:fs";
 import { google } from "googleapis";
 
 const REDIRECT_URI = "http://localhost:53682/oauth2callback";
-const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"];
+// gmail.modify (superset of readonly) is needed so Bosa can label emails
+// "Bosa/Processed" after loading them into TAPP — plain gmail.readonly
+// can list/read messages but can't apply labels.
+const SCOPES = ["https://www.googleapis.com/auth/gmail.modify"];
 
 const clientId = process.env.GMAIL_CLIENT_ID;
 const clientSecret = process.env.GMAIL_CLIENT_SECRET;

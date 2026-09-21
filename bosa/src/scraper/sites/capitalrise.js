@@ -49,7 +49,13 @@ export async function scrapeDeal(dealEmail) {
     throw new Error("Missing SOURCE_CAPITALRISE_EMAIL / SOURCE_CAPITALRISE_PASSWORD");
   }
 
-  const browser = await chromium.launch();
+  // PLAYWRIGHT_CHROMIUM_PATH is only needed in environments (like this dev
+  // sandbox) that pre-bundle a Chromium build Playwright's installed
+  // version doesn't expect. Leave unset for a normal deployment where
+  // `npx playwright install` has provisioned the browser Playwright wants.
+  const browser = await chromium.launch({
+    executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
+  });
   try {
     const page = await browser.newPage();
     await login(page, email, password);

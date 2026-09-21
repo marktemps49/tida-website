@@ -1,15 +1,32 @@
 // Given a deal email, identifies its source website and dispatches to that
 // site's scraper. Add one module per source under src/scraper/sites/,
-// register it in scrapersBySource, and add its sender domain to
-// sourcesByFromDomain as new firms are onboarded (see CLAUDE.md).
+// register it in scrapersBySource, and add an entry to sourceConfigs as
+// new firms are onboarded (see CLAUDE.md).
 
 const scrapersBySource = {
   capitalrise: () => import("./sites/capitalrise.js"),
 };
 
-const sourcesByFromDomain = {
-  "capitalrise.com": "capitalrise",
-};
+/**
+ * One entry per source firm. `gmailSubjectFilter` narrows the watcher's
+ * Gmail query to just deal-notification emails (as opposed to other mail
+ * from the same sender domain, e.g. newsletters) — see CLAUDE.md for how
+ * CapitalRise's was found.
+ */
+const sourceConfigs = [
+  {
+    source: "capitalrise",
+    fromDomain: "capitalrise.com",
+    gmailSubjectFilter: `subject:"NEW INVESTMENT OPPORTUNITY"`,
+  },
+];
+
+/** Used by the Gmail watcher to build its search query, so source firms
+ * only need to be maintained here. */
+export const knownSources = sourceConfigs.map(({ fromDomain, gmailSubjectFilter }) => ({
+  fromDomain,
+  gmailSubjectFilter,
+}));
 
 /**
  * @param {{ id: string, from: string, subject: string, body: string }} dealEmail
@@ -31,5 +48,5 @@ export async function scrapeDealFromEmail(dealEmail) {
  */
 function identifySource(dealEmail) {
   const domain = dealEmail.from.match(/@([\w.-]+)/)?.[1]?.toLowerCase();
-  return domain ? sourcesByFromDomain[domain] : undefined;
+  return sourceConfigs.find((c) => c.fromDomain === domain)?.source;
 }

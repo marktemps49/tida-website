@@ -45,15 +45,37 @@ After that, `.env` has all three `GMAIL_*` values and `npm start` can
 authenticate. If you ever revoke access or rotate the client secret, just
 re-run step 4.
 
+The scope requested is `gmail.modify` (not just `gmail.readonly`) — Bosa
+needs it to label an email "Bosa/Processed" once it's loaded into TAPP, so
+the next run doesn't process it again. If your refresh token was generated
+before this changed, re-run step 4 to get a new one with the right scope.
+
+## Running on a schedule
+
+Bosa is a one-shot script, not a long-running process: each run checks
+Gmail for deal emails not yet labeled `Bosa/Processed`, processes whatever
+it finds (this includes any historical backlog on the very first run —
+nothing is skipped just for being old), and exits. Run it once a day via
+cron, e.g. at 5pm:
+
+```cron
+0 17 * * * cd /path/to/bosa && npm start >> bosa.log 2>&1
+```
+
 ## Layout
 
-- `src/gmail/watcher.js` — watches the Gmail inbox for deal emails.
+- `src/gmail/client.js` — shared Gmail API client + message parsing, used
+  by both the watcher and `scripts/gmail-search.js`.
+- `src/gmail/watcher.js` — finds unprocessed deal emails from known source
+  firms, and marks one processed once it's fully loaded into TAPP.
 - `src/scraper/` — dispatches to a per-source-website scraper
   (`src/scraper/sites/`, copy `_template.js` to add a new source).
-- `src/standardize/schema.js` — maps raw scraped data to TAPP's standard
-  deal shape.
-- `src/tapp/client.js` — loads a standardized deal into TAPP.
+- `src/standardize/` — maps each source's raw scraped data to TAPP's
+  Investor Paper JSON shape (`docs/tapp-investor-paper-spec.md`).
+- `src/tapp/client.js` — loads a standardized deal into TAPP (TAPP itself
+  has no ingestion endpoint yet — see the spec doc).
 - `src/index.js` — wires the pipeline together.
 
-Everything is currently a stub — see the "Open items" section in
-`CLAUDE.md` for what needs to be defined before this runs end-to-end.
+See the "Open items" section in `CLAUDE.md` for what's still undefined —
+notably, this needs to run somewhere with real internet access; it can't
+reach source sites from this dev sandbox.

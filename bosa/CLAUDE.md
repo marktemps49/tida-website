@@ -11,8 +11,19 @@ the data into a common format, and loads it into TAPP (see below).
 
 ## Trigger
 
-The pipeline is triggered automatically when a new deal email arrives in a
-specific Gmail inbox (access to be provided later by the user).
+**Decided**: a daily cron job at 5pm runs Bosa once (`npm start` — see
+README.md "Running on a schedule"). It's a one-shot script, not a
+long-running watcher: each run queries Gmail for deal emails not yet
+labeled `Bosa/Processed` (via `src/gmail/watcher.js`), processes each one,
+and exits. A deal only gets the label after it's *successfully* made it
+all the way into TAPP — a failed run leaves it unlabeled so the next day's
+run retries it.
+
+**Decided**: the very first run processes the full historical backlog of
+unprocessed deal emails (nothing is skipped just for being old) — verified
+in a real (if network-blocked) run against the actual inbox, which found
+14 past "NEW INVESTMENT OPPORTUNITY" emails from CapitalRise, none
+previously labeled.
 
 ## Pipeline steps
 
@@ -119,6 +130,13 @@ specific Gmail inbox (access to be provided later by the user).
   ever loaded the real login or deal page. `login()`'s form selectors and
   the DOM-based `extractRisks()`/`extractHeroImages()` need checking
   against the real site by whoever runs Bosa with real internet access.
+  Confirmed by a real run against the actual inbox: Playwright launches
+  Chromium fine (using `PLAYWRIGHT_CHROMIUM_PATH` — this sandbox's
+  installed Playwright version doesn't match its pre-bundled browser; a
+  real deployment with `npx playwright install` run shouldn't need this
+  var at all), gets as far as `page.goto("https://www.capitalrise.com/login")`,
+  and fails there with `ERR_TUNNEL_CONNECTION_FAILED` — exactly the known
+  network block, nothing else wrong.
 - Useful debug tool: `node scripts/gmail-search.js "<gmail query>"` — reads
   the watched inbox directly (already-working Gmail API) and prints
   sender/subject/body/links for any message. Used to work out the above
@@ -130,7 +148,8 @@ specific Gmail inbox (access to be provided later by the user).
 - **Bosa currently runs in a sandboxed Claude Code container with no
   outbound network access to source sites** — actual scraping needs to run
   somewhere with normal internet access (the user's machine, a VPS, a
-  cloud job). Not yet decided where.
+  cloud job). Not yet decided where. Verified this is the *only* blocker
+  left for CapitalRise's login/deal-page step (see ⚠️ above).
 - The four CapitalRise fields with no confirmed source, listed above
   (`ltc`, `location` heuristic, risk `severity`, `heroImages` selector).
 - How Bosa authenticates/connects to TAPP: the JSON payload shape is
@@ -140,11 +159,17 @@ specific Gmail inbox (access to be provided later by the user).
   its URL, auth mechanism, response shape, and whether hero images need a
   separate upload call (vs. sending plain URLs) are all TBD until it's
   built.
-- Error handling / retry behavior if a scrape or login fails.
-- How multiple deals in flight at once should be handled (concurrency, dedup).
-- How `watchForDealEmails()` actually detects "new" emails (polling
-  interval, Gmail label/read-state, dedup across restarts) — currently a
-  stub that yields nothing.
+- Error handling / retry behavior if a scrape or login fails beyond "leave
+  it unlabeled, retry tomorrow" (e.g. alerting, a max-retry cutoff for a
+  deal that keeps failing).
+- How multiple deals in flight at once should be handled (concurrency —
+  currently strictly sequential, one deal at a time, in `src/index.js`).
+- The Gmail refresh token currently in `.env` was generated with
+  `gmail.readonly` scope, before the "Bosa/Processed" labeling design was
+  decided — labeling requires `gmail.modify`. **Needs re-running
+  `scripts/get-gmail-refresh-token.js`'s OAuth flow** (now updated to
+  request `gmail.modify`) to get a token that can actually apply the
+  label; untested until then.
 
 ## Stack & layout
 
