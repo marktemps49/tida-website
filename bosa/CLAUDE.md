@@ -30,8 +30,11 @@ specific Gmail inbox (access to be provided later by the user).
 - **Bosa** — this tool (the deal scraper described in this file).
 - **TAPP** (TIDA Private Client App) — the destination system. It is a
   **separate application in a separate repository/codebase**, not part of
-  `tida-website`. Bosa integrates with TAPP as an external system (exact
-  integration method — API, file drop, DB write, etc. — TBD).
+  `tida-website`. Bosa POSTs a JSON payload to it (not UI automation) — the
+  payload shape is finalized as a spec for TAPP to build an endpoint
+  against; see `docs/tapp-investor-paper-spec.md`. TAPP has **no such
+  endpoint yet** — this is a spec to hand to whoever builds it, not
+  documentation of something live.
 - **Source websites** — the multiple external sites Bosa logs into to find
   and scrape deals. First one live: CapitalRise (below). More to follow.
 
@@ -94,7 +97,8 @@ specific Gmail inbox (access to be provided later by the user).
     Tested against the real Bourne End content end-to-end — produces
     `name`/`city` = "Bourne End, Buckinghamshire", `irr` = 10.2, `ltv` = 75,
     `type` = "1st charge", `sector` = "Residential", `termMonths` = 12,
-    all matching the TAPP form screenshot.
+    all matching the TAPP form screenshot. Full spec + example payload:
+    `docs/tapp-investor-paper-spec.md`.
   - **Fields with no confirmed source, currently guessed/defaulted** — flagged
     with TODO comments in `standardize/capitalrise.js`, need the user's input:
     - `ltc` (loan-to-cost): not in the email or deal page content gathered
@@ -129,10 +133,13 @@ specific Gmail inbox (access to be provided later by the user).
   cloud job). Not yet decided where.
 - The four CapitalRise fields with no confirmed source, listed above
   (`ltc`, `location` heuristic, risk `severity`, `heroImages` selector).
-- How Bosa authenticates/connects to TAPP: confirmed the target is a JSON
-  payload matching `TappInvestorPaper` (see above) for a direct API call,
-  but TAPP's actual endpoint URL, auth mechanism, and whether hero images
-  need a separate upload call are still unknown.
+- How Bosa authenticates/connects to TAPP: the JSON payload shape is
+  finalized as the spec (`docs/tapp-investor-paper-spec.md`) for TAPP's
+  side to build an endpoint against — **decided this is the direction**,
+  not still open. What's still unknown: the endpoint doesn't exist yet, so
+  its URL, auth mechanism, response shape, and whether hero images need a
+  separate upload call (vs. sending plain URLs) are all TBD until it's
+  built.
 - Error handling / retry behavior if a scrape or login fails.
 - How multiple deals in flight at once should be handled (concurrency, dedup).
 - How `watchForDealEmails()` actually detects "new" emails (polling
