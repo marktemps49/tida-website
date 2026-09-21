@@ -108,6 +108,12 @@ async function login(page, email, password) {
   // own target elements to be actionable, so nothing here depends on the
   // network having gone idle.
   await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
+
+  // A cookie-consent banner (or similar overlay) can visually cover the
+  // form and intercept clicks even though the underlying fields report as
+  // present — dismiss one if present, best-effort, before interacting.
+  await dismissCookieBanner(page);
+
   // The login page also has a (hidden) registration form sharing generic
   // input types/names — a real run found page.fill() silently picking the
   // invisible "RegisterForm[password]" field and timing out. `:visible` is
@@ -122,9 +128,38 @@ async function login(page, email, password) {
   // AJAX login without a URL change, this times out harmlessly and the
   // caller proceeds — worth revisiting if login turns out not to have
   // actually succeeded.
-  await page.waitForURL((url) => !url.pathname.includes("/login"), { timeout: 15000 }).catch(() => {
+  const loggedIn = await page
+    .waitForURL((url) => !url.pathname.includes("/login"), { timeout: 15000 })
+    .then(() => true)
+    .catch(() => false);
+
+  if (!loggedIn || process.env.BOSA_DEBUG_DUMP_PAGE_TEXT === "1") {
+    const snippet = (await page.innerText("body").catch(() => "(couldn't read body)")).slice(0, 1500);
+    console.log(
+      `login: ${loggedIn ? "left" : "still on"} /login after submit (url: ${page.url()})`
+    );
+    console.log("--- Post-submit page text (first 1500 chars) ---");
+    console.log(snippet);
+    console.log("--- END ---");
+  }
+  if (!loggedIn) {
     console.warn("login: URL didn't change away from /login within 15s — login may not have completed");
-  });
+  }
+}
+
+/** Best-effort dismissal of a cookie-consent overlay, if one is shown. */
+async function dismissCookieBanner(page) {
+  const candidates = [
+    page.getByRole("button", { name: /accept all/i }),
+    page.getByRole("button", { name: /accept cookies/i }),
+    page.getByRole("button", { name: /^accept$/i }),
+  ];
+  for (const button of candidates) {
+    if ((await button.count()) > 0 && (await button.first().isVisible().catch(() => false))) {
+      await button.first().click().catch(() => {});
+      return;
+    }
+  }
 }
 
 /**
