@@ -16,6 +16,11 @@ on:
         description: "Cap on deals processed this run (leave empty for no limit)"
         required: false
         type: string
+      debug_dump_page_text:
+        description: "Dump each deal page's raw text to the log (for calibrating scraper regexes)"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   run-bosa:
@@ -63,3 +68,4 @@ jobs:
           SOURCE_CAPITALRISE_EMAIL: ${{ secrets.SOURCE_CAPITALRISE_EMAIL }}
           SOURCE_CAPITALRISE_PASSWORD: ${{ secrets.SOURCE_CAPITALRISE_PASSWORD }}
           BOSA_MAX_DEALS: ${{ inputs.max_deals }}
+          BOSA_DEBUG_DUMP_PAGE_TEXT: ${{ inputs.debug_dump_page_text && '1' || '' }}

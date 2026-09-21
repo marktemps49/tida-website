@@ -63,6 +63,11 @@ export async function scrapeDeal(dealEmail) {
 
     const pageTitle = await readPageTitle(page);
     const bodyText = await page.innerText("body");
+    if (process.env.BOSA_DEBUG_DUMP_PAGE_TEXT === "1") {
+      console.log(`--- RAW page.innerText("body") for ${dealUrl} ---`);
+      console.log(bodyText);
+      console.log("--- END RAW ---");
+    }
     const sections = extractSections(bodyText);
     const highlights = extractHighlights(bodyText);
     const risks = await extractRisks(page);
