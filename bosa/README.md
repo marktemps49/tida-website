@@ -78,6 +78,10 @@ testing by hand). It can also be triggered manually from the Actions tab
 - `src/tapp/client.js` — loads a standardized deal into TAPP (TAPP itself
   has no ingestion endpoint yet — see the spec doc).
 - `src/index.js` — wires the pipeline together.
+- `tools/deal-preview.html` — standalone dev tool, open directly in a
+  browser (no server needed). Paste a deal JSON (`InvestorPaper` shape) to
+  preview it roughly as TAPP would show it, for checking scraper/
+  standardizer output before TAPP's real ingestion endpoint exists.
 
 See the "Open items" section in `CLAUDE.md` for what's still undefined —
 notably, this needs to run somewhere with real internet access; it can't

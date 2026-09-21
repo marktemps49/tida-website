@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bosa — Deal Preview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --navy: #12172e;
+    --pink: #d6336c;
+    --bg: #f4f2f7;
+    --card: #ffffff;
+    --border: #e4e1ec;
+    --text: #1a1a2e;
+    --muted: #6b6b7b;
+    --mint: #d6f5e8;
+    --mint-text: #0f6d4c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
+
+  .layout { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+
+  .input-panel {
+    flex: 1 1 380px;
+    min-width: 320px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .input-panel label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  textarea {
+    width: 100%;
+    height: 420px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    resize: vertical;
+    background: #fbfaff;
+  }
+  .buttons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  button {
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    cursor: pointer;
+  }
+  button.primary { background: var(--navy); color: white; border-color: var(--navy); }
+  button:hover { filter: brightness(0.97); }
+  input[type="file"] { display: none; }
+  .error {
+    margin-top: 10px;
+    color: #b3261e;
+    font-size: 13px;
+    white-space: pre-wrap;
+  }
+
+  /* --- phone preview --- */
+  .phone-wrap { flex: 0 0 auto; display: flex; justify-content: center; }
+  .phone {
+    width: 340px;
+    border: 10px solid #1c1c1e;
+    border-radius: 40px;
+    background: white;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    overflow: hidden;
+  }
+  .phone-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px 10px;
+    font-weight: 600;
+    font-size: 15px;
+    border-bottom: 1px solid var(--border);
+  }
+  .gallery {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    background: #eee;
+    min-height: 90px;
+  }
+  .gallery img { width: 100%; height: 140px; object-fit: cover; flex-shrink: 0; }
+  .gallery .empty {
+    width: 100%;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .body-pad { padding: 14px 16px 20px; }
+  .deal-name { font-size: 19px; font-weight: 700; margin: 0 0 10px; }
+  .chips { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .chip {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--mint);
+    color: var(--mint-text);
+  }
+  .chip.muted { background: #eee; color: var(--muted); }
+  .fact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 10px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 14px;
+  }
+  .fact-label { font-size: 10.5px; letter-spacing: 0.04em; color: var(--muted); text-transform: uppercase; }
+  .fact-value { font-size: 13.5px; font-weight: 600; margin-top: 2px; }
+  .cta {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: var(--pink);
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    border: none;
+  }
+  .section { border-bottom: 1px solid var(--border); }
+  .section summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 14px 0;
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .section summary::after { content: "⌄"; color: var(--muted); }
+  .section[open] summary::after { content: "⌃"; }
+  .section summary::-webkit-details-marker { display: none; }
+  .section .content { padding: 0 0 16px; font-size: 13.5px; line-height: 1.5; color: #333; }
+
+  .risk { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; }
+  .risk-title-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .risk-title { font-weight: 700; font-size: 13.5px; }
+  .severity { font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .severity.Low { background: var(--mint); color: var(--mint-text); }
+  .severity.Medium { background: #fff3cd; color: #8a6100; }
+  .severity.High { background: #fde2e1; color: #a3231b; }
+  .risk-field { margin-top: 6px; font-size: 12.5px; }
+  .risk-field .k { color: var(--muted); font-weight: 600; }
+
+  .placeholder { padding: 60px 20px; text-align: center; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<h1>Bosa — Deal Preview</h1>
+<p class="subtitle">
+  Paste a scraped/standardized deal JSON (the <code>InvestorPaper</code> shape — see
+  <code>docs/tapp-investor-paper-spec.md</code>) to preview it as TAPP would show it, before
+  the real TAPP integration exists. Local dev tool only — nothing here talks to TAPP or any
+  network.
+</p>
+
+<div class="layout">
+  <div class="input-panel">
+    <label for="json-input">Deal JSON</label>
+    <textarea id="json-input" spellcheck="false"></textarea>
+    <div class="buttons">
+      <button class="primary" id="render-btn">Render</button>
+      <button id="example-btn">Load Bourne End example</button>
+      <button id="file-btn">Load JSON file…</button>
+      <input type="file" id="file-input" accept="application/json">
+    </div>
+    <div class="error" id="error"></div>
+  </div>
+
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-header">‹ Investment details</div>
+      <div id="gallery" class="gallery"><div class="empty">No hero images</div></div>
+      <div class="body-pad" id="preview">
+        <div class="placeholder">Paste JSON and click Render to see the preview.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const EXAMPLE = {
+  name: "Bourne End, Buckinghamshire",
+  summary: "CapitalRise is providing a bridge loan to the Borrower to refinance the existing debt secured on a development of six houses in Bourne End, Buckinghamshire (the Properties) and provide a sales bridge period. CapitalRise investors will fund the loan alongside an institutional funding partner.",
+  irr: 10.2,
+  ltv: 75,
+  ltc: null,
+  type: "1st charge",
+  sector: "Residential",
+  termMonths: 12,
+  location: "Outside London",
+  city: "Bourne End, Buckinghamshire",
+  heroImages: [],
+  keyRisks: [
+    {
+      title: "Capital and Income Risk",
+      description: "Your capital is at risk and the income is not guaranteed.",
+      mitigation: "CapitalRise will typically take a first or second legal charge over the Properties on your behalf. On this investment, CR BOURNE END SS LIMITED is funding alongside an institutional funding partner who will be repaid first.",
+      severity: "Medium"
+    },
+    {
+      title: "Subordination Risk",
+      description: "Investors will be repaid after the institutional funding partner",
+      mitigation: "Whilst you have access to a shared first legal charge, this investment has a risk profile more similar to a mezzanine loan than a senior loan, reflected in the higher rate of return for investors.",
+      severity: "Medium"
+    },
+    {
+      title: "Sales Rate Risk",
+      description: "Sales may be slower than forecast and/or the properties may sell for less",
+      mitigation: "Your investment includes a 6-month buffer from the end of the estimated repayment date up until the hard stop date of August 2028 in the event that potential sales take longer than anticipated.",
+      severity: "Medium"
+    }
+  ]
+};
+
+const $ = (id) => document.getElementById(id);
+const input = $("json-input");
+const errorBox = $("error");
+const preview = $("preview");
+const gallery = $("gallery");
+
+function fmtPercent(v) {
+  return (v === null || v === undefined || v === "") ? "—" : `${v}%`;
+}
+function fmtText(v) {
+  return (v === null || v === undefined || v === "") ? "—" : v;
+}
+function esc(s) {
+  const d = document.createElement("div");
+  d.textContent = s ?? "";
+  return d.innerHTML;
+}
+
+function render(deal) {
+  errorBox.textContent = "";
+
+  // Gallery
+  if (Array.isArray(deal.heroImages) && deal.heroImages.length > 0) {
+    gallery.innerHTML = deal.heroImages.map(
+      (src) => `<img src="${esc(src)}" onerror="this.style.opacity=0.15">`
+    ).join("");
+  } else {
+    gallery.innerHTML = `<div class="empty">No hero images</div>`;
+  }
+
+  const risks = Array.isArray(deal.keyRisks) ? deal.keyRisks : [];
+
+  preview.innerHTML = `
+    <h2 class="deal-name">${esc(fmtText(deal.name))}</h2>
+    <div class="chips">
+      <span class="chip">IRR ${esc(fmtPercent(deal.irr))}</span>
+      <span class="chip">LTV ${esc(fmtPercent(deal.ltv))}</span>
+      <span class="chip ${deal.ltc == null ? 'muted' : ''}">LTC ${esc(fmtPercent(deal.ltc))}</span>
+    </div>
+    <div class="fact-grid">
+      <div><div class="fact-label">Type</div><div class="fact-value">${esc(fmtText(deal.type))}</div></div>
+      <div><div class="fact-label">Sector</div><div class="fact-value">${esc(fmtText(deal.sector))}</div></div>
+      <div><div class="fact-label">Term</div><div class="fact-value">${deal.termMonths != null ? esc(deal.termMonths) + " months" : "—"}</div></div>
+      <div><div class="fact-label">Location</div><div class="fact-value">${esc(fmtText(deal.city))}</div></div>
+    </div>
+    <button class="cta" disabled title="Preview only — not a real action">Express Interest</button>
+
+    <details class="section" open>
+      <summary>Summary</summary>
+      <div class="content">${esc(fmtText(deal.summary))}</div>
+    </details>
+
+    <details class="section" open>
+      <summary>Key risks (${risks.length})</summary>
+      <div class="content">
+        ${risks.length === 0 ? "<em>No risks in this payload.</em>" : risks.map((r) => `
+          <div class="risk">
+            <div class="risk-title-row">
+              <span class="risk-title">${esc(fmtText(r.title))}</span>
+              <span class="severity ${esc(r.severity || "")}">${esc(fmtText(r.severity))}</span>
+            </div>
+            <div class="risk-field"><span class="k">Description:</span> ${esc(fmtText(r.description))}</div>
+            <div class="risk-field"><span class="k">Mitigation:</span> ${esc(fmtText(r.mitigation))}</div>
+          </div>
+        `).join("")}
+      </div>
+    </details>
+  `;
+}
+
+function tryRender() {
+  let deal;
+  try {
+    deal = JSON.parse(input.value);
+  } catch (err) {
+    errorBox.textContent = "Invalid JSON: " + err.message;
+    return;
+  }
+  try {
+    render(deal);
+  } catch (err) {
+    errorBox.textContent = "Couldn't render this payload: " + err.message;
+  }
+}
+
+$("render-btn").addEventListener("click", tryRender);
+
+$("example-btn").addEventListener("click", () => {
+  input.value = JSON.stringify(EXAMPLE, null, 2);
+  tryRender();
+});
+
+$("file-btn").addEventListener("click", () => $("file-input").click());
+$("file-input").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    input.value = reader.result;
+    tryRender();
+  };
+  reader.readAsText(file);
+});
+
+// Load the example on first open so there's something to look at immediately.
+input.value = JSON.stringify(EXAMPLE, null, 2);
+tryRender();
+</script>
+
+</body>
+</html>
