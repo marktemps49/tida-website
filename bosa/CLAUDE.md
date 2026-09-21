@@ -53,8 +53,23 @@ previously labeled.
 
 ### CapitalRise (`src/scraper/sites/capitalrise.js`) — first source, in progress
 
-- **Login**: `https://www.capitalrise.com/login`, credentials in
-  `SOURCE_CAPITALRISE_EMAIL` / `SOURCE_CAPITALRISE_PASSWORD`.
+- **Login is reCAPTCHA-blocked — confirmed by a real run.** Automated form
+  login (`page.fill()` + submit) silently fails: the form just re-displays
+  with no error and no URL change, because the login page shows "This site
+  is protected by reCAPTCHA." This project does not attempt to defeat that
+  (CAPTCHA-solving services, browser fingerprint spoofing, etc.) — it would
+  mean circumventing an anti-bot measure CapitalRise deliberately built in.
+  **Fix in place**: a human logs into CapitalRise by hand once (solving the
+  CAPTCHA themselves) via `scripts/capitalrise-save-session.js`, run on a
+  machine with a real display (not this sandbox, not GitHub Actions — both
+  are headless). That script saves the authenticated session (cookies +
+  local storage) to a file; its contents go into the
+  `SOURCE_CAPITALRISE_SESSION_STATE` secret, which `capitalrise.js` loads
+  via Playwright's `storageState` instead of logging in itself. See
+  `bosa/README.md` "CapitalRise session setup". Sessions eventually expire
+  (unknown how often) — `capitalrise.js` detects this (deal page shows the
+  logged-out teaser text) and throws a clear error naming the fix, rather
+  than silently scraping nothing like it did before this was diagnosed.
 - **Deal email pattern**: sender is `@capitalrise.com` (e.g.
   `charlotte.macewan@capitalrise.com` — staff address varies, domain is
   what `identifySource()` in `scraper/index.js` matches on). Subject:
@@ -125,31 +140,45 @@ previously labeled.
       rating at all — every risk currently defaults to "Medium".
     - `heroImages`: selector is a guess (see above) — untested even at the
       parsing-logic level, unlike sections/highlights/risks.
-- **⚠️ Still unverified against the live site**: this sandbox's network
-  egress is blocked to `capitalrise.com` (org policy) — no browser has
-  ever loaded the real login or deal page. `login()`'s form selectors and
-  the DOM-based `extractRisks()`/`extractHeroImages()` need checking
-  against the real site by whoever runs Bosa with real internet access.
-  Confirmed by a real run against the actual inbox: Playwright launches
-  Chromium fine (using `PLAYWRIGHT_CHROMIUM_PATH` — this sandbox's
-  installed Playwright version doesn't match its pre-bundled browser; a
-  real deployment with `npx playwright install` run shouldn't need this
-  var at all), gets as far as `page.goto("https://www.capitalrise.com/login")`,
-  and fails there with `ERR_TUNNEL_CONNECTION_FAILED` — exactly the known
-  network block, nothing else wrong.
-- Useful debug tool: `node scripts/gmail-search.js "<gmail query>"` — reads
-  the watched inbox directly (already-working Gmail API) and prints
-  sender/subject/body/links for any message. Used to work out the above
-  from a real Bourne End deal email. Reuse it for onboarding future firms.
+- **Runs on GitHub Actions, which has real internet access** — this dev
+  sandbox is network-blocked to `capitalrise.com`, but Bosa doesn't run
+  here; it runs via `.github/workflows/bosa-daily.yml` on GitHub's
+  runners, confirmed to reach the real site fine (uses
+  `PLAYWRIGHT_CHROMIUM_PATH` only in this sandbox for local dev testing —
+  GitHub Actions runs `npx playwright install` itself so doesn't need it).
+- **⚠️ Extraction against the real *logged-in* page is still unverified.**
+  Every real run so far has actually hit the reCAPTCHA login wall above
+  and scraped the *logged-out* teaser page by mistake (different content
+  entirely — e.g. its Investment Summary section is headed "OVERVIEW", not
+  "PLAN" like the real page the user pasted). Once a
+  `SOURCE_CAPITALRISE_SESSION_STATE` is set up (see above),
+  `extractSections()`/`extractHighlights()` need re-testing against what
+  the actual logged-in page produces — they're currently only verified
+  against the fixture file (`src/scraper/sites/__fixtures__/capitalrise-bourne-end.txt`,
+  pasted by the user), which may or may not exactly match the live DOM's
+  `page.innerText()` output. `extractRisks()`/`extractHeroImages()` (DOM
+  selectors, not text-based) are unverified guesses regardless.
+- Useful debug tools:
+  - `node scripts/gmail-search.js "<gmail query>"` — reads the watched
+    inbox directly and prints sender/subject/body/links for any message.
+    Used to work out the deal email pattern from a real Bourne End email.
+  - `BOSA_DEBUG_DUMP_PAGE_TEXT=1` env var (or the `debug_dump_page_text`
+    workflow_dispatch input) — logs the deal page's raw
+    `page.innerText("body")`. This is what revealed the reCAPTCHA/logged-out
+    issue above; reuse it to verify extraction once really logged in.
+  - `BOSA_MAX_DEALS=<n>` env var (or the `max_deals` workflow_dispatch
+    input) — caps how many deals a run processes, for controlled testing
+    against a real backlog instead of all of it at once.
 
 ## Open items (not yet defined)
 
 - More source websites beyond CapitalRise, and their login credentials.
-- **Bosa currently runs in a sandboxed Claude Code container with no
-  outbound network access to source sites** — actual scraping needs to run
-  somewhere with normal internet access (the user's machine, a VPS, a
-  cloud job). Not yet decided where. Verified this is the *only* blocker
-  left for CapitalRise's login/deal-page step (see ⚠️ above).
+- **Re-verify CapitalRise extraction against the real logged-in page**
+  once `SOURCE_CAPITALRISE_SESSION_STATE` is set up — see ⚠️ above. This
+  is now the actual next step, not network access (resolved — see above).
+- How often CapitalRise's saved session expires, and whether that can be
+  automated at all (vs. always needing a human to re-run
+  `capitalrise-save-session.js`).
 - The four CapitalRise fields with no confirmed source, listed above
   (`ltc`, `location` heuristic, risk `severity`, `heroImages` selector).
 - How Bosa authenticates/connects to TAPP: the JSON payload shape is

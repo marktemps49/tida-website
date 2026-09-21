@@ -1,23 +1,23 @@
-// CapitalRise scraper: logs in, opens the deal linked from the
+// CapitalRise scraper: loads a pre-authenticated session (see
+// scripts/capitalrise-save-session.js), opens the deal linked from the
 // notification email, and reads everything needed to build a TAPP
 // Investor Paper (see standardize/capitalrise.js for the target shape).
 //
-// IMPORTANT: this sandbox's network egress is blocked to capitalrise.com
-// (organization policy), so nothing below has run against the real
-// login/deal pages. It's written from a real deal page's content, pasted
-// by the user (see src/scraper/sites/__fixtures__/capitalrise-bourne-end.txt),
-// but the actual DOM structure — table markup, class names, image
-// containers — is unknown. Whoever runs Bosa from an environment with
-// real internet access needs to open a real deal page, compare it against
-// the selectors here, and fix what doesn't match (see CLAUDE.md "Open
-// items"). The prose-section and highlights-table parsing works off the
-// page's plain text (page.innerText), which is more resilient to markup
-// changes than per-field CSS selectors; only login() and the risks-table
-// and hero-image lookups depend on actual DOM structure.
+// Automated form login does NOT work here — a live run confirmed
+// CapitalRise's login is behind reCAPTCHA, which rejects the automated
+// submission silently (form just re-displays, no error, no URL change).
+// Attempting to defeat that (CAPTCHA-solving services, fingerprint
+// spoofing, etc.) isn't something this project does — it would mean
+// circumventing an anti-bot measure CapitalRise deliberately put on their
+// platform. Instead, a human logs in once by hand (solving the CAPTCHA
+// themselves) via scripts/capitalrise-save-session.js, which saves that
+// authenticated session; this scraper just reuses it. See CLAUDE.md
+// "Sources > CapitalRise" for the full story of how this was found.
 
 import { chromium } from "playwright";
 
 const BASE_URL = "https://www.capitalrise.com";
+const LOGGED_OUT_MARKER = /must be a member, and logged in/i;
 
 const HIGHLIGHT_LABELS = [
   "Net forecast annual return",
@@ -43,10 +43,19 @@ export async function scrapeDeal(dealEmail) {
     );
   }
 
-  const email = process.env.SOURCE_CAPITALRISE_EMAIL;
-  const password = process.env.SOURCE_CAPITALRISE_PASSWORD;
-  if (!email || !password) {
-    throw new Error("Missing SOURCE_CAPITALRISE_EMAIL / SOURCE_CAPITALRISE_PASSWORD");
+  const sessionStateJson = process.env.SOURCE_CAPITALRISE_SESSION_STATE;
+  if (!sessionStateJson) {
+    throw new Error(
+      "Missing SOURCE_CAPITALRISE_SESSION_STATE — run " +
+        "scripts/capitalrise-save-session.js on a machine with a real " +
+        "display to generate one (see CLAUDE.md)"
+    );
+  }
+  let storageState;
+  try {
+    storageState = JSON.parse(sessionStateJson);
+  } catch (err) {
+    throw new Error(`SOURCE_CAPITALRISE_SESSION_STATE isn't valid JSON: ${err.message}`);
   }
 
   // PLAYWRIGHT_CHROMIUM_PATH is only needed in environments (like this dev
@@ -57,9 +66,10 @@ export async function scrapeDeal(dealEmail) {
     executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
   });
   try {
-    const page = await browser.newPage();
-    await login(page, email, password);
+    const context = await browser.newContext({ storageState });
+    const page = await context.newPage();
     await page.goto(dealUrl, { waitUntil: "domcontentloaded" });
+    await dismissCookieBanner(page);
     await waitForContentReady(page);
 
     const pageTitle = await readPageTitle(page);
@@ -69,6 +79,15 @@ export async function scrapeDeal(dealEmail) {
       console.log(bodyText);
       console.log("--- END RAW ---");
     }
+
+    if (LOGGED_OUT_MARKER.test(bodyText)) {
+      throw new Error(
+        "Saved CapitalRise session is expired or invalid (deal page shows the " +
+          "logged-out teaser) — re-run scripts/capitalrise-save-session.js and " +
+          "update the SOURCE_CAPITALRISE_SESSION_STATE secret"
+      );
+    }
+
     const sections = extractSections(bodyText);
     const highlights = extractHighlights(bodyText);
     const risks = await extractRisks(page);
@@ -97,54 +116,6 @@ export function extractDealUrl(htmlOrText) {
     /https:\/\/www\.capitalrise\.com\/property-investment\/[^\s"'<>]+/
   );
   return match?.[0];
-}
-
-async function login(page, email, password) {
-  // "networkidle" (waiting for a quiet period in network activity) is
-  // unreliable on real sites — a live run timed out here entirely, likely
-  // because something on the page (chat widget, analytics, polling) never
-  // goes fully quiet. "domcontentloaded" is faster and more reliable; the
-  // subsequent page.fill()/page.click() calls already auto-wait for their
-  // own target elements to be actionable, so nothing here depends on the
-  // network having gone idle.
-  await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-
-  // A cookie-consent banner (or similar overlay) can visually cover the
-  // form and intercept clicks even though the underlying fields report as
-  // present — dismiss one if present, best-effort, before interacting.
-  await dismissCookieBanner(page);
-
-  // The login page also has a (hidden) registration form sharing generic
-  // input types/names — a real run found page.fill() silently picking the
-  // invisible "RegisterForm[password]" field and timing out. `:visible` is
-  // a Playwright CSS extension that disambiguates by picking only the
-  // currently-shown field, regardless of how many matches share the
-  // selector otherwise.
-  await page.fill('input[type="email"]:visible, input[name="email"]:visible', email);
-  await page.fill('input[type="password"]:visible, input[name="password"]:visible', password);
-  await page.click('button[type="submit"]:visible');
-  // Wait for navigation away from /login as the sign of a successful
-  // submit, rather than networkidle. If the site instead does an in-place
-  // AJAX login without a URL change, this times out harmlessly and the
-  // caller proceeds — worth revisiting if login turns out not to have
-  // actually succeeded.
-  const loggedIn = await page
-    .waitForURL((url) => !url.pathname.includes("/login"), { timeout: 15000 })
-    .then(() => true)
-    .catch(() => false);
-
-  if (!loggedIn || process.env.BOSA_DEBUG_DUMP_PAGE_TEXT === "1") {
-    const snippet = (await page.innerText("body").catch(() => "(couldn't read body)")).slice(0, 1500);
-    console.log(
-      `login: ${loggedIn ? "left" : "still on"} /login after submit (url: ${page.url()})`
-    );
-    console.log("--- Post-submit page text (first 1500 chars) ---");
-    console.log(snippet);
-    console.log("--- END ---");
-  }
-  if (!loggedIn) {
-    console.warn("login: URL didn't change away from /login within 15s — login may not have completed");
-  }
 }
 
 /** Best-effort dismissal of a cookie-consent overlay, if one is shown. */

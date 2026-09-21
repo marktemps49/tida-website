@@ -50,6 +50,28 @@ needs it to label an email "Bosa/Processed" once it's loaded into TAPP, so
 the next run doesn't process it again. If your refresh token was generated
 before this changed, re-run step 4 to get a new one with the right scope.
 
+## CapitalRise session setup
+
+CapitalRise's login is behind reCAPTCHA, which blocks Bosa's automated
+form login outright (confirmed against the live site — see CLAUDE.md). A
+human logs in once by hand instead, and Bosa reuses that session:
+
+```bash
+cd bosa
+node scripts/capitalrise-save-session.js
+```
+
+This **must run on a machine with a real display** (not this dev sandbox,
+not GitHub Actions) — it opens a visible browser window for you to log
+into CapitalRise normally, including solving the CAPTCHA yourself. Once
+done, it saves `capitalrise-session.json` and prints instructions for
+pasting its contents into the `SOURCE_CAPITALRISE_SESSION_STATE` secret
+(`.env` locally, or the GitHub Actions secret for the scheduled workflow).
+
+Sessions eventually expire (how often isn't known yet). When that happens,
+Bosa throws a clear error naming the problem rather than silently
+scraping nothing — just re-run the script above and update the secret.
+
 ## Running on a schedule
 
 Bosa is a one-shot script, not a long-running process: each run checks
