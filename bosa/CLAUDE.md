@@ -66,17 +66,55 @@ specific Gmail inbox (access to be provided later by the user).
   Plus a full "Investment Summary" prose section (PLAN, TERM, LOCATION,
   PROPERTY, THE BORROWER, THE SECURITY, SECURITY TRUSTEE, VALUATION, LOAN
   TO VALUE, EXIT PLAN), a Financials section (funding structure at entry
-  vs. exit), and a Risks table. Full detail in the fixture file.
-  **The user is providing the target extraction format separately —
-  `capitalrise.js`'s `HIGHLIGHT_LABELS`/`extractDealFields` have not been
-  rewritten to match the real page yet; that's the next step once the
-  format arrives.**
+  vs. exit), and a two-column Risks table (risk title/description, then
+  "how this applies to you"). Full detail in the fixture file.
+- **Extraction is implemented and tested against the fixture** (not the
+  live site — see the ⚠️ below):
+  - `extractSections()` / `extractHighlights()` in `capitalrise.js` parse
+    the page's plain text (`page.innerText("body")`) for the Investment
+    Summary prose and the Investment Highlights table. Chosen over
+    per-field CSS selectors because innerText survives markup/class
+    changes better; verified against the fixture to produce exactly the
+    PLAN/TERM/LOCATION/PROPERTY/THE SECURITY text and all 7 highlight
+    values.
+  - `extractRisks()` / `extractHeroImages()` still use DOM selectors
+    (`table tr` for risks, `[class*="gallery|carousel"] img` for images)
+    since that structure can't be inferred from pasted plain text — these
+    are guesses, unverified.
+  - `standardize/capitalrise.js`'s `standardizeCapitalRiseDeal()` maps the
+    scraped raw shape to TAPP's **Investor Paper JSON** (confirmed from
+    screenshots of TAPP's admin "Edit Investor Paper" form + its mobile
+    preview — the target is a JSON payload for a direct API call, *not*
+    driving that UI form):
+    ```
+    { name, summary, irr, ltv, ltc, type, sector, termMonths,
+      location: "London" | "Outside London", city, heroImages,
+      keyRisks: [{ title, description, mitigation, severity }] }
+    ```
+    Tested against the real Bourne End content end-to-end — produces
+    `name`/`city` = "Bourne End, Buckinghamshire", `irr` = 10.2, `ltv` = 75,
+    `type` = "1st charge", `sector` = "Residential", `termMonths` = 12,
+    all matching the TAPP form screenshot.
+  - **Fields with no confirmed source, currently guessed/defaulted** — flagged
+    with TODO comments in `standardize/capitalrise.js`, need the user's input:
+    - `ltc` (loan-to-cost): not in the email or deal page content gathered
+      so far. The page's "day one LTV" (68% for Bourne End) is a different
+      metric and doesn't match the 65.0 shown in the TAPP form example —
+      unclear if LTC is calculable from CapitalRise's data at all, or
+      needs a different source/manual entry.
+    - `location` ("London" vs "Outside London"): heuristic only — checks
+      whether "London" appears in the city name. Wrong for a Greater
+      London deal that doesn't literally say "London" (CapitalRise covers
+      "London and the Home Counties").
+    - `keyRisks[].severity`: CapitalRise's risk table has no severity
+      rating at all — every risk currently defaults to "Medium".
+    - `heroImages`: selector is a guess (see above) — untested even at the
+      parsing-logic level, unlike sections/highlights/risks.
 - **⚠️ Still unverified against the live site**: this sandbox's network
-  egress is blocked to `capitalrise.com` (org policy), so even once
-  `capitalrise.js` is rewritten to extract the fields above, the actual
-  DOM selectors (`login()`, `readLabelledValue()`) are unverified — no
-  browser has ever loaded the real page. Whoever runs Bosa somewhere with
-  real internet access needs to confirm/fix them.
+  egress is blocked to `capitalrise.com` (org policy) — no browser has
+  ever loaded the real login or deal page. `login()`'s form selectors and
+  the DOM-based `extractRisks()`/`extractHeroImages()` need checking
+  against the real site by whoever runs Bosa with real internet access.
 - Useful debug tool: `node scripts/gmail-search.js "<gmail query>"` — reads
   the watched inbox directly (already-working Gmail API) and prints
   sender/subject/body/links for any message. Used to work out the above
@@ -89,11 +127,12 @@ specific Gmail inbox (access to be provided later by the user).
   outbound network access to source sites** — actual scraping needs to run
   somewhere with normal internet access (the user's machine, a VPS, a
   cloud job). Not yet decided where.
-- Exact scraped fields and the standardized deal schema TAPP expects
-  (`extra` in `StandardDeal` currently holds anything that doesn't fit the
-  guessed core fields, so nothing scraped is lost in the meantime).
-- Whether CapitalRise's loan amount is obtainable, and from where.
-- How Bosa authenticates/connects to TAPP (API endpoint, auth, data format).
+- The four CapitalRise fields with no confirmed source, listed above
+  (`ltc`, `location` heuristic, risk `severity`, `heroImages` selector).
+- How Bosa authenticates/connects to TAPP: confirmed the target is a JSON
+  payload matching `TappInvestorPaper` (see above) for a direct API call,
+  but TAPP's actual endpoint URL, auth mechanism, and whether hero images
+  need a separate upload call are still unknown.
 - Error handling / retry behavior if a scrape or login fails.
 - How multiple deals in flight at once should be handled (concurrency, dedup).
 - How `watchForDealEmails()` actually detects "new" emails (polling

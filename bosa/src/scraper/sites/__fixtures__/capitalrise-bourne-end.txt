@@ -1,7 +1,9 @@
 Source: https://www.capitalrise.com/property-investment/Bourne-End-Buckinghamshire-Bridge-Loan
 Saved: 2026-09-21 (pasted by user — this sandbox has no network access to capitalrise.com)
 Purpose: real deal-page content for building/testing the CapitalRise extraction
-logic offline. See bosa/CLAUDE.md "Sources > CapitalRise".
+logic offline. See bosa/CLAUDE.md "Sources > CapitalRise". Kept verbatim
+(including the full two-column Risks table) so nothing needed for the
+TAPP Key Risks mapping (Title/Description/Mitigation) is lost.
 
 Investment Summary
 PLAN – CapitalRise is providing a bridge loan to the Borrower to refinance the existing debt secured on a development of six houses in Bourne End, Buckinghamshire (the Properties) and provide a sales bridge period. CapitalRise investors will fund the loan alongside an institutional funding partner. Investors will be repaid after the institutional funding partner and will receive a higher rate of return to reflect the increased risk. N.B. There are no phases or tiers to this deal, and this represents the sole opportunity for CapitalRise investors to invest in this deal.
@@ -61,26 +63,32 @@ The investment is structured as deep-discounted bonds. Deep-discounted bonds (al
 Investors in all phases are ranked pari passu (equal). This means holders of earlier issued bonds will be repaid at the same time as holders of bonds issued during later phases.
 CR BOURNE END SS LIMITED is the beneficiary of a Shared First Legal Charge. In any forced sale of the Property, investors will recover their capital and accrued return before the Borrower, but after the institutional funding partner. Due to the higher risk, investors will benefit from a higher rate of return than the institutional funding partner.
 If the bonds are repaid before the hard stop date then CR BOURNE END SS LIMITED is not required to withhold UK income tax on this investment and so returns will be paid gross.
-Should the bonds be repaid after the hard stop date (August 2028) late payment interest will accrue at the rate of 12.20% p.a. For bonds not purchased using the CapitalRise IFISA which have accrued interest after the hard stop date, CapitalRise is required by HMRC to withhold the basic rate of tax (20%) on interest payments and pay this directly to HMRC.
+Should the bonds be repaid after the hard stop date (August 2028) late payment interest will accrue at the rate of 12.20% p.a. For bonds not purchased using the CapitalRise IFISA which have accrued interest after the hard stop date, CapitalRise is required by HMRC to withhold the basic rate of tax (20%) on interest payments and pay this directly to HMRC. If the basic rate is not applicable, you may need to contact HMRC. If you are not a UK taxpayer you will need to reclaim this tax payment from HMRC. Income tax may be payable by investors on any return on the investments unless you invest via your CapitalRise IFISA. Investors should take their own tax advice from an appropriately qualified professional.
 
 Risks
-Capital and Income Risk – Your capital is at risk and the income is not guaranteed.
-Compensation Scheme – The Financial Services Compensation Scheme does not cover poor investment performance.
-Subordination Risk – Investors will be repaid after the institutional funding partner.
-Market Risk – If the market for residential property in the local area deteriorates, it may not be possible to sell the Properties at the price currently projected and/or there could be a delay in the sales.
-Investment Liquidity Risk – You need to be prepared to hold this investment for the full term.
-Recovery Risk – If CapitalRise has to enforce its security package the enforcement of security may not be sufficient to cover the return of all capital and interest.
-Sales Rate Risk – Sales may be slower than forecast and/or the properties may sell for less.
-Refinance Risk – The Borrower may refinance their debt at the end of the term. They may not be able to do so.
+As with all investments you should carefully consider the key risks involved which include:
+
+Risks | How this applies to you
+Capital and Income Risk – Your capital is at risk and the income is not guaranteed. | CapitalRise will typically take a first or second legal charge over the Properties on your behalf. On this investment, CR BOURNE END SS LIMITED is funding alongside an institutional funding partner who will be repaid first. They both have the benefit of a shared first legal charge against the Property. This means the Borrower cannot sell the asset without first repaying the loan or allocating proceeds from the sale to repay it. A legal charge does not guarantee the repayment of your investment. In any forced sale of the Properties, investors will recover their capital and accrued return before the Borrower. CapitalRise Investors are subordinated to the institutional funding partner and will be repaid after the institutional funding partner has been repaid in full.
+Compensation Scheme – The Financial Services Compensation Scheme does not cover poor investment performance. | You cannot claim FSCS compensation if your original investment or returns are lost.
+Subordination Risk – Investors will be repaid after the institutional funding partner | Whilst you have access to a shared first legal charge, for the avoidance of doubt, this investment is not like a senior loan because you will be repaid after the institutional funding partner which means that this investment has a risk profile more similar to a mezzanine loan than a senior loan which is reflected in the higher rate of return for investors.
+Market Risk – If the market for residential property in the local area deteriorates, it may not be possible to sell the Properties at the price currently projected and/or there could be a delay in the sales. | If sales of the Properties are achieved the value would need to be less than 75% of the current market value (CMV) before investors' invested capital and accrued return are at risk.
+Investment Liquidity Risk – You need to be prepared to hold this investment for the full term. | We do operate the CapitalRise Bulletin Board where you can post your investment for sale at its current value. This does not guarantee a sale. CapitalRise will charge a fee of 1.5% of the sale if a buyer is found. You can post your investment for sale from within your CapitalRise account. Investments can be posted at any point up until one month prior to the start of the original range of the estimated end date (in this case 30th June 2027).
+Recovery Risk - If CapitalRise has to enforce its security package the enforcement of security may not be sufficient to cover the return of all capital and interest | Enforcing security is time-consuming and carries additional costs. If the Borrower defaults and CapitalRise has to enforce the security package, there is a risk that the amount that can be recovered is less than the amount that is due to investors and investors may receive back only a proportion of their original capital investment or none at all.
+Sales Rate Risk – Sales may be slower than forecast and/or the properties may sell for less | The primary exit for your investment is through sales of the Properties. It is important to note that at least 5 of the 6 Properties would need to be sold to repay the bonds in full. Your investment includes a 6-month buffer from the end of the estimated repayment date up until the hard stop date of August 2028 in the event that potential sales take longer than anticipated.
+Refinance Risk - The Borrower may refinance their debt at the end of the term. They may not be able to do so | One potential exit for your investment is to refinance with another lender. This may take longer than planned or not be possible at all. In a refinance, a lender will only lend up to a percentage of the value of the Properties, which may not be sufficient to repay the whole of the CapitalRise loan. Your investment has an estimated term of 12-18 months and a 6-month buffer from the end of the estimated repayment date until the hard stop date (August 2028) in the event that a refinance takes longer than anticipated.
 
 Deal Room
 Risks and due diligence
-Before any investment is offered to investors it must pass our due diligence and credit approval process.
-The CapitalRise rating is designed to help investors to compare CapitalRise investments. The higher along the risk scale a project is the more risky it is and therefore the higher return you should expect.
+Before any investment is offered to investors it must pass our due diligence and credit approval process, details of which can be found here.
+The CapitalRise rating is designed to help investors to compare CapitalRise investments. The higher along the risk scale a project is the more risky it is and therefore the higher return you should expect. This is a subjective assessment made by our due diligence team and we cannot guarantee that this is an accurate measure of risk, quality or suitability.
 Note: This risk rating is provided by CapitalRise and is not independently verified.
 The valuation for this property contains sensitive information. We are therefore only able to provide this upon request.
+Lower perceived risk / Higher perceived risk
 
 Borrower: A Borrower who has completed more than 5 projects.
 Property & Business Plan: A sales bridge loan.
 Capital Structure: Subordinated senior debt (ranking behind a funding partner) with an exit LTV of 75%
 Security: Shared security package where CapitalRise Investors are subordinated to the Institutional Funding Partner and will be repaid second.
+
+* Page URL: https://www.capitalrise.com/property-investment/Bourne-End-Buckinghamshire-Bridge-Loan
