@@ -33,16 +33,54 @@ specific Gmail inbox (access to be provided later by the user).
   `tida-website`. Bosa integrates with TAPP as an external system (exact
   integration method — API, file drop, DB write, etc. — TBD).
 - **Source websites** — the multiple external sites Bosa logs into to find
-  and scrape deals. Specific sites, credentials, and page structures: TBD.
+  and scrape deals. First one live: CapitalRise (below). More to follow.
+
+## Sources
+
+### CapitalRise (`src/scraper/sites/capitalrise.js`) — first source, in progress
+
+- **Login**: `https://www.capitalrise.com/login`, credentials in
+  `SOURCE_CAPITALRISE_EMAIL` / `SOURCE_CAPITALRISE_PASSWORD`.
+- **Deal email pattern**: sender is `@capitalrise.com` (e.g.
+  `charlotte.macewan@capitalrise.com` — staff address varies, domain is
+  what `identifySource()` in `scraper/index.js` matches on). Subject:
+  `NEW INVESTMENT OPPORTUNITY - <Deal Name> Investment Launch`.
+- **Deal page URL**: embedded in the email's HTML body as
+  `https://www.capitalrise.com/property-investment/<Deal-Name-Slug>`
+  (surrounded by click-tracking redirect links — `extractDealUrl()`
+  regex-matches the direct `capitalrise.com` one).
+- **Fields available in the email's "INVESTMENT HIGHLIGHTS" table** (and
+  presumably also on the deal page itself): Forecast Net Return, Estimated
+  Term, Anticipated LTV at Exit, IFISA Eligible, Legal Charge, Loan Type.
+  No loan amount is in the email — TBD whether it's on the full deal page.
+- **⚠️ Unverified**: this sandbox's network egress is blocked to
+  `capitalrise.com` (org policy), so the login form selectors and
+  highlight-table scraping in `capitalrise.js` were written from the
+  email's content and typical site patterns, but never run against the
+  real pages. Whoever runs Bosa somewhere with real internet access needs
+  to verify/fix the selectors in `login()` and `readLabelledValue()`.
+- Useful debug tool: `node scripts/gmail-search.js "<gmail query>"` — reads
+  the watched inbox directly (already-working Gmail API) and prints
+  sender/subject/body/links for any message. Used to work out the above
+  from a real Bourne End deal email. Reuse it for onboarding future firms.
 
 ## Open items (not yet defined)
 
-- Gmail account/credentials Bosa will monitor (user will provide access).
-- List of source websites and login credentials for each.
-- Exact scraped fields and the standardized deal schema TAPP expects.
+- More source websites beyond CapitalRise, and their login credentials.
+- **Bosa currently runs in a sandboxed Claude Code container with no
+  outbound network access to source sites** — actual scraping needs to run
+  somewhere with normal internet access (the user's machine, a VPS, a
+  cloud job). Not yet decided where.
+- Exact scraped fields and the standardized deal schema TAPP expects
+  (`extra` in `StandardDeal` currently holds anything that doesn't fit the
+  guessed core fields, so nothing scraped is lost in the meantime).
+- Whether CapitalRise's loan amount is obtainable, and from where.
 - How Bosa authenticates/connects to TAPP (API endpoint, auth, data format).
 - Error handling / retry behavior if a scrape or login fails.
 - How multiple deals in flight at once should be handled (concurrency, dedup).
+- How `watchForDealEmails()` actually detects "new" emails (polling
+  interval, Gmail label/read-state, dedup across restarts) — currently a
+  stub that yields nothing.
 
 ## Stack & layout
 

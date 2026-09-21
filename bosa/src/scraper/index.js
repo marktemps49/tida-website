@@ -1,9 +1,14 @@
 // Given a deal email, identifies its source website and dispatches to that
-// site's scraper. Add one module per source under src/scraper/sites/ and
-// register it below as source sites are confirmed.
+// site's scraper. Add one module per source under src/scraper/sites/,
+// register it in scrapersBySource, and add its sender domain to
+// sourcesByFromDomain as new firms are onboarded (see CLAUDE.md).
 
 const scrapersBySource = {
-  // acme: () => import("./sites/acme.js"),
+  capitalrise: () => import("./sites/capitalrise.js"),
+};
+
+const sourcesByFromDomain = {
+  "capitalrise.com": "capitalrise",
 };
 
 /**
@@ -25,7 +30,6 @@ export async function scrapeDealFromEmail(dealEmail) {
  * @returns {string | undefined} a key into scrapersBySource
  */
 function identifySource(dealEmail) {
-  // TODO: implement once the set of source websites and how their emails
-  // are distinguished (sender domain, subject pattern, etc.) is known.
-  return undefined;
+  const domain = dealEmail.from.match(/@([\w.-]+)/)?.[1]?.toLowerCase();
+  return domain ? sourcesByFromDomain[domain] : undefined;
 }
