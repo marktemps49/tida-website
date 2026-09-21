@@ -1,22 +1,25 @@
 // One-time setup helper: exchanges a Google OAuth consent for a long-lived
-// refresh token, and writes it into .env. Run this once after creating the
-// OAuth client (see README.md "Gmail OAuth setup").
+// refresh token, and writes it into .env.
 //
-// Usage:
-//   GMAIL_CLIENT_ID=... GMAIL_CLIENT_SECRET=... node scripts/get-gmail-refresh-token.js
-// (or fill GMAIL_CLIENT_ID / GMAIL_CLIENT_SECRET into .env first, then just
-//  `node scripts/get-gmail-refresh-token.js`)
+// This runs in a remote container, so the loopback-server flow (browser and
+// script on the same machine) doesn't work here. Instead:
 //
-// Must be run on a machine with a browser, since it opens a localhost
-// callback for Google to redirect back to after you approve access.
+//   1. Run:  node scripts/get-gmail-refresh-token.js
+//      It prints a Google consent URL.
+//   2. Open that URL in your own browser, sign in as
+//      miles.templeman49@gmail.com, and approve access.
+//   3. Google redirects to http://localhost:53682/oauth2callback?code=...
+//      — your browser will show "can't be reached", that's expected
+//      (nothing is listening on your machine). Copy the "code" value out
+//      of the address bar.
+//   4. Run:  node scripts/get-gmail-refresh-token.js "<code>"
+//      This exchanges it for a refresh token and writes it into .env.
 
 import "dotenv/config";
 import fs from "node:fs";
-import http from "node:http";
 import { google } from "googleapis";
 
-const PORT = 53682;
-const REDIRECT_URI = `http://localhost:${PORT}/oauth2callback`;
+const REDIRECT_URI = "http://localhost:53682/oauth2callback";
 const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"];
 
 const clientId = process.env.GMAIL_CLIENT_ID;
@@ -31,46 +34,47 @@ if (!clientId || !clientSecret) {
 
 const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, REDIRECT_URI);
 
-const authUrl = oauth2Client.generateAuthUrl({
-  access_type: "offline",
-  prompt: "consent", // forces a refresh_token even on repeat runs
-  scope: SCOPES,
-});
+const code = process.argv[2];
 
-console.log("\n1. Open this URL and sign in as miles.templeman49@gmail.com:\n");
-console.log(authUrl);
-console.log("\n2. Approve access. You'll be redirected to localhost — this script handles that.\n");
+if (!code) {
+  const authUrl = oauth2Client.generateAuthUrl({
+    access_type: "offline",
+    prompt: "consent", // forces a refresh_token even on repeat runs
+    scope: SCOPES,
+  });
 
-const server = http.createServer(async (req, res) => {
-  if (!req.url.startsWith("/oauth2callback")) {
-    res.writeHead(404);
-    res.end();
-    return;
+  console.log("\n1. Open this URL in your own browser and sign in as miles.templeman49@gmail.com:\n");
+  console.log(authUrl);
+  console.log(
+    "\n2. Approve access. You'll land on a 'can't be reached' page at " +
+      `${REDIRECT_URI}?code=...&scope=... — that's expected.`
+  );
+  console.log(
+    '3. Copy the value of the "code" parameter from that URL, then run:\n' +
+      '   node scripts/get-gmail-refresh-token.js "<code>"\n'
+  );
+  process.exit(0);
+}
+
+try {
+  const { tokens } = await oauth2Client.getToken(code);
+  if (!tokens.refresh_token) {
+    console.error(
+      "No refresh_token in the response. This usually means access was already " +
+        "granted before without revoking it — go to https://myaccount.google.com/permissions, " +
+        "remove access for this app, then re-run step 1 to get a fresh code."
+    );
+    process.exit(1);
   }
-
-  const url = new URL(req.url, REDIRECT_URI);
-  const code = url.searchParams.get("code");
-
-  try {
-    const { tokens } = await oauth2Client.getToken(code);
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("Success — you can close this tab and return to the terminal.");
-    server.close();
-
-    console.log("\nRefresh token obtained. Writing it into .env ...");
-    upsertEnvVar(".env", "GMAIL_REFRESH_TOKEN", tokens.refresh_token);
-    console.log("Done — GMAIL_REFRESH_TOKEN set in .env.");
-  } catch (err) {
-    res.writeHead(500, { "Content-Type": "text/plain" });
-    res.end("Failed to exchange code for tokens — see the terminal.");
-    console.error("Token exchange failed:", err);
-    server.close();
-  }
-});
-
-server.listen(PORT, () => {
-  console.log(`Waiting for the OAuth redirect on ${REDIRECT_URI} ...`);
-});
+  upsertEnvVar(".env", "GMAIL_REFRESH_TOKEN", tokens.refresh_token);
+  console.log("Success — GMAIL_REFRESH_TOKEN written to .env.");
+} catch (err) {
+  console.error("Token exchange failed:", err.message ?? err);
+  console.error(
+    "Codes are single-use and expire quickly — if this is a re-run, get a fresh code from step 1."
+  );
+  process.exit(1);
+}
 
 function upsertEnvVar(path, key, value) {
   const content = fs.existsSync(path) ? fs.readFileSync(path, "utf8") : "";
