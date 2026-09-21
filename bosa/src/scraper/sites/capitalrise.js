@@ -95,9 +95,15 @@ export function extractDealUrl(htmlOrText) {
 
 async function login(page, email, password) {
   await page.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" });
-  await page.fill('input[type="email"], input[name="email"]', email);
-  await page.fill('input[type="password"], input[name="password"]', password);
-  await page.click('button[type="submit"]');
+  // The login page also has a (hidden) registration form sharing generic
+  // input types/names — a real run found page.fill() silently picking the
+  // invisible "RegisterForm[password]" field and timing out. `:visible` is
+  // a Playwright CSS extension that disambiguates by picking only the
+  // currently-shown field, regardless of how many matches share the
+  // selector otherwise.
+  await page.fill('input[type="email"]:visible, input[name="email"]:visible', email);
+  await page.fill('input[type="password"]:visible, input[name="password"]:visible', password);
+  await page.click('button[type="submit"]:visible');
   await page.waitForLoadState("networkidle");
 }
 
