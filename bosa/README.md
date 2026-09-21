@@ -55,12 +55,15 @@ before this changed, re-run step 4 to get a new one with the right scope.
 Bosa is a one-shot script, not a long-running process: each run checks
 Gmail for deal emails not yet labeled `Bosa/Processed`, processes whatever
 it finds (this includes any historical backlog on the very first run —
-nothing is skipped just for being old), and exits. Run it once a day via
-cron, e.g. at 5pm:
+nothing is skipped just for being old), and exits.
 
-```cron
-0 17 * * * cd /path/to/bosa && npm start >> bosa.log 2>&1
-```
+**Decided**: runs via GitHub Actions rather than a self-managed VPS —
+`.github/workflows/bosa-daily.yml` (repo root) schedules it once a day at
+5pm UK time (handling the BST/GMT switch automatically — see the comment
+in that file) and pulls all secrets from the repo's GitHub Actions
+secrets, not `.env` (which stays local-only, used for `npm start` when
+testing by hand). It can also be triggered manually from the Actions tab
+("Run workflow") for testing.
 
 ## Layout
 

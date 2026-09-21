@@ -1,0 +1,59 @@
+name: Bosa daily deal scrape
+
+# Runs Bosa once a day at 5pm UK time. GitHub Actions cron is UTC-only and
+# has no DST awareness, so both possible UTC times for "5pm UK" are
+# scheduled (16:00 UTC for BST/summer, 17:00 UTC for GMT/winter) — the
+# "Check it's actually 5pm UK time" step below skips whichever one doesn't
+# currently correspond to 17:00 Europe/London, so only one actually runs
+# each day regardless of the time of year.
+on:
+  schedule:
+    - cron: "0 16 * * *"
+    - cron: "0 17 * * *"
+  workflow_dispatch: {} # allows manually triggering a run for testing
+
+jobs:
+  run-bosa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check it's actually 5pm UK time
+        id: check-time
+        run: |
+          current_hour=$(TZ="Europe/London" date +%H)
+          if [ "$current_hour" = "17" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "It's ${current_hour}:00 in Europe/London, not 17:00 — this is the other DST-case trigger, skipping."
+          fi
+
+      - name: Checkout
+        if: steps.check-time.outputs.should_run == 'true'
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        if: steps.check-time.outputs.should_run == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        if: steps.check-time.outputs.should_run == 'true'
+        working-directory: bosa
+        run: npm ci
+
+      - name: Install Playwright's Chromium
+        if: steps.check-time.outputs.should_run == 'true'
+        working-directory: bosa
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Bosa
+        if: steps.check-time.outputs.should_run == 'true'
+        working-directory: bosa
+        run: npm start
+        env:
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          SOURCE_CAPITALRISE_EMAIL: ${{ secrets.SOURCE_CAPITALRISE_EMAIL }}
+          SOURCE_CAPITALRISE_PASSWORD: ${{ secrets.SOURCE_CAPITALRISE_PASSWORD }}
