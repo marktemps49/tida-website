@@ -182,9 +182,13 @@ export function extractSections(text) {
 
 /**
  * Reads the "Investment Highlights" label/value pairs out of the page's
- * plain text. A browser's innerText renders adjacent table cells
- * tab-separated on one line ("Label\tValue"); falls back to checking the
- * next line in case the real markup renders them as separate blocks.
+ * plain text. A browser's innerText renders most adjacent table cells
+ * tab-separated on one line ("Label\tValue"); "Anticipated LTV at exit" is
+ * a confirmed exception on the real page — its label and value land on
+ * separate lines with one or two blank lines between them (verified
+ * against a live run) — so the fallback skips blank lines forward from the
+ * label until it finds a non-empty one, rather than assuming exactly one
+ * line of separation.
  * @param {string} text
  */
 export function extractHighlights(text) {
@@ -197,17 +201,22 @@ export function extractHighlights(text) {
       continue;
     }
     const index = lines.findIndex((line) => line === label);
-    if (index !== -1 && index + 1 < lines.length) {
-      highlights[label] = lines[index + 1];
+    if (index === -1) continue;
+    for (let j = index + 1; j < lines.length; j++) {
+      if (lines[j] !== "") {
+        highlights[label] = lines[j];
+        break;
+      }
     }
   }
   return highlights;
 }
 
 /**
- * TODO: unverified — assumes the Risks section is a <table> with two
- * columns (risk title/description, then how it applies to the investor).
- * Adjust the selector once the real markup is known.
+ * Reads the Risks table's two columns (risk title/description, then how it
+ * applies to the investor). Confirmed working against a live run — the
+ * `table tr` selector matches, including the table's own header row
+ * ("Risks" / "How this applies to you"), which is filtered out below.
  */
 async function extractRisks(page) {
   const rows = page.locator("table tr", { hasText: "Risk" });
@@ -220,6 +229,7 @@ async function extractRisks(page) {
     const appliesToYou = (await cells.nth(1).textContent())?.trim() ?? "";
     const [title, ...rest] = left.split(/[–-]/);
     if (!title) continue;
+    if (/^risks?$/i.test(title.trim())) continue; // the table's own header row
     risks.push({
       title: title.trim(),
       description: rest.join("-").trim(),
