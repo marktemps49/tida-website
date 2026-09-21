@@ -18,6 +18,7 @@ async function main() {
     try {
       const rawDeal = await scrapeDealFromEmail(dealEmail);
       const deal = standardizeDeal(rawDeal);
+      console.log(`Standardized deal for ${dealEmail.subject}:`, JSON.stringify(deal, null, 2));
       await loadDealIntoTapp(deal);
       await markDealEmailProcessed(dealEmail.id);
       console.log(`Loaded deal "${deal.name}" into TAPP`);
